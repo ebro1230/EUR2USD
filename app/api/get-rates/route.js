@@ -209,7 +209,7 @@ export async function GET() {
 
       console.log("exchangeRateTrendData Length: ");
       console.log(exchangeRateTrendData.length);
-      if (exchangeRateTrendData.length < 1) {
+      if (!exchangeRateTrendData.length) {
         exchangeRateTrendData = [exchangeRate];
         console.log("stored rates < 1");
         console.log(exchangeRateTrendData);
