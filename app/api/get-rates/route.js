@@ -16,8 +16,8 @@ export async function GET() {
         console.log(user.lastCheck - currentTime);
         console.log("Interval:");
         console.log(user.interval);
-        console.log(user.lastCheck - currentTime > user.interval);
-        if (user.lastCheck - currentTime > user.interval) {
+        console.log(currentTime - user.lastCheck > user.interval);
+        if (currentTime - user.lastCheck > user.interval) {
           const data = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`,
             {
