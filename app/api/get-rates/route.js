@@ -126,17 +126,18 @@ export async function GET() {
       average = average + dataPoint;
     });
     average = average / exchangeRateTrendData.length - 1;
-
-    if (
-      exchangeRateTrendData[exchangeRateTrendData.length - 1] <
-        exchangeRateTrendData[exchangeRateTrendData.length - 16] &&
-      exchangeRateTrendData[exchangeRateTrendData.length - 16] <
-        exchangeRateTrendData[exchangeRateTrendData.length - 8]
-    ) {
-      return {
-        trend: "negative",
-        message: "Exchange Rate is Trending Negatively",
-      };
+    if (exchangeRateTrendData.length > 16) {
+      if (
+        exchangeRateTrendData[exchangeRateTrendData.length - 1] <
+          exchangeRateTrendData[exchangeRateTrendData.length - 16] &&
+        exchangeRateTrendData[exchangeRateTrendData.length - 16] <
+          exchangeRateTrendData[exchangeRateTrendData.length - 8]
+      ) {
+        return {
+          trend: "negative",
+          message: "Exchange Rate is Trending Negatively",
+        };
+      }
     }
 
     if (
@@ -148,38 +149,39 @@ export async function GET() {
         message: "Exchange Rate is Trending Positively",
       };
     }
-
-    if (
-      (exchangeRateTrendData[exchangeRateTrendData.length - 1] -
-        exchangeRateTrendData[exchangeRateTrendData.length - 2]) /
-        15 >
+    if (exchangeRateTrendData.length > 6) {
+      if (
+        (exchangeRateTrendData[exchangeRateTrendData.length - 1] -
+          exchangeRateTrendData[exchangeRateTrendData.length - 2]) /
+          15 >
+          (exchangeRateTrendData[exchangeRateTrendData.length - 2] -
+            exchangeRateTrendData[exchangeRateTrendData.length - 3]) /
+            15 &&
         (exchangeRateTrendData[exchangeRateTrendData.length - 2] -
           exchangeRateTrendData[exchangeRateTrendData.length - 3]) /
-          15 &&
-      (exchangeRateTrendData[exchangeRateTrendData.length - 2] -
-        exchangeRateTrendData[exchangeRateTrendData.length - 3]) /
-        15 >
+          15 >
+          (exchangeRateTrendData[exchangeRateTrendData.length - 3] -
+            exchangeRateTrendData[exchangeRateTrendData.length - 4]) /
+            15 &&
         (exchangeRateTrendData[exchangeRateTrendData.length - 3] -
           exchangeRateTrendData[exchangeRateTrendData.length - 4]) /
-          15 &&
-      (exchangeRateTrendData[exchangeRateTrendData.length - 3] -
-        exchangeRateTrendData[exchangeRateTrendData.length - 4]) /
-        15 >
+          15 >
+          (exchangeRateTrendData[exchangeRateTrendData.length - 4] -
+            exchangeRateTrendData[exchangeRateTrendData.length - 5]) /
+            15 &&
         (exchangeRateTrendData[exchangeRateTrendData.length - 4] -
           exchangeRateTrendData[exchangeRateTrendData.length - 5]) /
-          15 &&
-      (exchangeRateTrendData[exchangeRateTrendData.length - 4] -
-        exchangeRateTrendData[exchangeRateTrendData.length - 5]) /
-        15 >
-        (exchangeRateTrendData[exchangeRateTrendData.length - 5] -
-          exchangeRateTrendData[exchangeRateTrendData.length - 6]) /
-          15
-    ) {
-      return {
-        trend: "positive",
-        message:
-          "The Rate at Which the Exchange Rate is Increasing Has Been Going Up Over The Past Hour",
-      };
+          15 >
+          (exchangeRateTrendData[exchangeRateTrendData.length - 5] -
+            exchangeRateTrendData[exchangeRateTrendData.length - 6]) /
+            15
+      ) {
+        return {
+          trend: "positive",
+          message:
+            "The Rate at Which the Exchange Rate is Increasing Has Been Going Up Over The Past Hour",
+        };
+      }
     }
     return {
       trend: "neutral",
