@@ -6,15 +6,24 @@ export async function GET() {
   try {
     await connectToDatabase();
     let currentTime = new Date();
+    console.log(currentTime);
     const users = await User.find({});
+    console.log("USERS:");
+    console.log(users);
     if (users.length) {
       users.forEach((user) => {
+        console.log("Interval Difference");
+        console.log(user.lastCheck - currentTime);
+        console.log("Interval:");
+        console.log(user.interval);
+        console.log(user.lastCheck - currentTime > user.interval);
         if (user.lastCheck - currentTime > user.interval) {
           fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/scraper`, {
             method: "GET",
           })
             .then((response) => response.json())
             .then((data) => {
+              console.log("DATA: ", data);
               if (data > user.thresholdValue) {
                 fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
                   method: "POST",
