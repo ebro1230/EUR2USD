@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     hours: { type: Number },
     minutes: { type: Number },
     thresholdValue: { type: Number },
+    trendNotifications: { type: Boolean },
   },
   { timestamps: true }
 );

@@ -34,3 +34,12 @@
   display:flex;
   justify-content: center;
 }
+.exchange-rate-display-div{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.rate-buttons{
+  margin: 0.5rem;
+}

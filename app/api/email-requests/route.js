@@ -15,10 +15,11 @@ export async function POST(req) {
     if (existingUser) {
       return NextResponse.json(
         {
-          error:
+          success: true,
+          message:
             "Email with that threshold value & interval request rate already exists",
         },
-        { status: 400 }
+        { status: 200 }
       );
     } else {
       const newUser = await User.create({
@@ -35,11 +36,14 @@ export async function POST(req) {
           success: true,
           message: `Recurring Email Request created for ${newUser.email} when the euro is valued greater than or equal to $${newUser.thresholdValue}, checking every ${newUser.days} days, ${newUser.hours} hours, and ${newUser.minutes} minutes`,
         },
-        { status: 201 }
+        { status: 200 }
       );
     }
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 400 }
+    );
   }
 }
 
@@ -53,9 +57,10 @@ export async function DELETE(req) {
     if (existingUsers.deletedCount === 0) {
       return NextResponse.json(
         {
-          error: "That email was not receiving recurring rate requests",
+          success: true,
+          message: "That email was not receiving recurring rate requests",
         },
-        { status: 400 }
+        { status: 200 }
       );
     } else {
       return NextResponse.json(
@@ -63,10 +68,13 @@ export async function DELETE(req) {
           success: true,
           message: `Recurring Email Requests for ${body.email} deleted`,
         },
-        { status: 201 }
+        { status: 200 }
       );
     }
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 400 }
+    );
   }
 }
