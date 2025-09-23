@@ -18,14 +18,14 @@ export async function GET() {
         console.log(user.interval);
         console.log(user.lastCheck - currentTime > user.interval);
         if (user.lastCheck - currentTime > user.interval) {
-          fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/scraper`, {
+          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`, {
             method: "GET",
           })
             .then((response) => response.json())
             .then((data) => {
               console.log("DATA: ", data);
               if (data > user.thresholdValue) {
-                fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
+                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
