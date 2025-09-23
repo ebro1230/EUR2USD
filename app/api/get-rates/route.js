@@ -142,13 +142,14 @@ export async function GET() {
         try {
           // Fetch exchange rate
           const scraperResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio`
           );
           const rateData = await scraperResponse.json();
+          const exchangeRate = Number(rateData.replace(/,/g, "")) / 1000;
 
-          console.log(`Fetched rate for ${user.email}:`, rateData);
+          console.log(`Fetched rate for ${user.email}:`, exchangeRate);
 
-          if (rateData > user.thresholdValue) {
+          if (exchangeRate > user.thresholdValue) {
             try {
               // Send email
               const emailResponse = await fetch(
@@ -159,7 +160,7 @@ export async function GET() {
                   body: JSON.stringify({
                     email: user.email,
                     trend: "Exchange Rate Above Minimum Threshold",
-                    exchangeRate: rateData,
+                    exchangeRate: exchangeRate,
                   }),
                 }
               );

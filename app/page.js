@@ -137,7 +137,7 @@ export default function Home() {
     if (!makeRecurring) {
       const handleGetRateOnce = () => {
         setIsLoading(true);
-        fetch(`/api/scraper`, {
+        fetch(`/api/scraper-cheerio`, {
           method: "GET",
         })
           .then((response) => response.json())
@@ -178,7 +178,7 @@ export default function Home() {
         if (!intervalRef.current) {
           const handleGetRate = () => {
             setIsLoading(true);
-            fetch(`/api/scraper`, {
+            fetch(`/api/scraper-cheerio`, {
               method: "GET",
             })
               .then((response) => response.json())
