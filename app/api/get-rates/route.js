@@ -240,7 +240,7 @@ export async function GET() {
           (exchangeRate >= user.thresholdValue && trend.trend === "neutral") ||
           (exchangeRate >= user.thresholdValue && !user.trendNotifications)
         ) {
-          if (intervalDifference >= user.interval) {
+          if (intervalDifference >= user.interval - 1000 * 60 * 3) {
             await User.findOneAndUpdate(
               { email: user.email },
               { $set: { lastCheck: currentTime } }
