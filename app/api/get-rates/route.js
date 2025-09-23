@@ -207,6 +207,8 @@ export async function GET() {
         Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
       );
 
+      console.log("exchangeRateTrendData Length: ");
+      console.log(exchangeRateTrendData.length);
       if (exchangeRateTrendData.length < 1) {
         exchangeRateTrendData = [exchangeRate];
         console.log("stored rates < 1");
