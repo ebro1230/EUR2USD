@@ -215,7 +215,7 @@ export async function GET() {
         console.log(exchangeRateTrendData);
       } else if (
         exchangeRateTrendData.length <= 192 &&
-        exchangeRateTrendData > 0
+        exchangeRateTrendData.length > 0
       ) {
         exchangeRateTrendData.push(exchangeRate);
         console.log("stored rates > 0 & < 192");
