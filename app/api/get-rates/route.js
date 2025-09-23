@@ -195,8 +195,7 @@ export async function GET() {
 
     // Fetch all users
     const users = await User.find({});
-    const data = await ExchangeRateTrendData.find({});
-    let exchangeRateTrendData = data.storedExchangeRates;
+    let exchangeRateTrendData = await ExchangeRateTrendData.find({});
 
     try {
       // Fetch exchange rate
@@ -208,6 +207,7 @@ export async function GET() {
         Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
       );
 
+      console.log("exchangeRateTrendData: ");
       console.log(exchangeRateTrendData);
       if (!exchangeRateTrendData.length) {
         exchangeRateTrendData = [exchangeRate];
