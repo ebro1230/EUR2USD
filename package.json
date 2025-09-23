@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "vercel-build": "npx playwright install chromium firefox webkit && npx playwright install-deps  && next build"
+    "vercel-build": "npx playwright install -deps chromium firefox webkit && next build"
   },
   "dependencies": {
     "axios": "^1.12.2",
