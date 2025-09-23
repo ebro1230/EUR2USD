@@ -30,6 +30,7 @@ export async function POST(req) {
         minutes: body.minutes,
         lastCheck: new Date(),
         thresholdValue: body.thresholdValue,
+        trendNotifications: body.trendNotifications,
       });
       return NextResponse.json(
         {
