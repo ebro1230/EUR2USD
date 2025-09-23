@@ -195,8 +195,8 @@ export async function GET() {
 
     // Fetch all users
     const users = await User.find({});
-    let exchangeRateTrendData = await ExchangeRateTrendData.find({});
-    exchangeRateTrendData = [...exchangeRateTrendData.storedExchangeRates];
+    const data = await ExchangeRateTrendData.find({});
+    let exchangeRateTrendData = data.storedExchangeRates;
 
     try {
       // Fetch exchange rate
