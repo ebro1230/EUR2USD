@@ -126,7 +126,7 @@ export async function GET() {
       average = average + dataPoint;
     });
     average = average / (exchangeRateTrendData.length - 1);
-    if (exchangeRateTrendData.length > 16) {
+    if (exchangeRateTrendData.length >= 16) {
       if (
         exchangeRateTrendData[exchangeRateTrendData.length - 1] <
           exchangeRateTrendData[exchangeRateTrendData.length - 16] &&
@@ -149,7 +149,7 @@ export async function GET() {
         message: "Exchange Rate is Trending Positively",
       };
     }
-    if (exchangeRateTrendData.length > 6) {
+    if (exchangeRateTrendData.length >= 6) {
       if (
         (exchangeRateTrendData[exchangeRateTrendData.length - 1] -
           exchangeRateTrendData[exchangeRateTrendData.length - 2]) /
