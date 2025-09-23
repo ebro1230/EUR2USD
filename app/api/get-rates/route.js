@@ -125,7 +125,7 @@ export async function GET() {
     exchangeRateTrendData.forEach((dataPoint) => {
       average = average + dataPoint;
     });
-    average = average / exchangeRateTrendData.length - 1;
+    average = average / (exchangeRateTrendData.length - 1);
     if (exchangeRateTrendData.length > 16) {
       if (
         exchangeRateTrendData[exchangeRateTrendData.length - 1] <
