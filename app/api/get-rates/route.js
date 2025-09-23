@@ -219,7 +219,7 @@ export async function GET() {
         exchangeRateTrendData.push(exchangeRate);
       }
 
-      await Model.findOneAndUpdate(
+      await ExchangeRateTrendData.findOneAndUpdate(
         {},
         { $set: { storedExchangeRates: exchangeRateTrendData } }
       );
