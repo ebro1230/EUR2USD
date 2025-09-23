@@ -11,55 +11,86 @@ export async function GET() {
     console.log("USERS:");
     console.log(users);
     if (users.length) {
-      users.forEach((user) => {
+      for (const user of users) {
         console.log("Interval Difference");
         console.log(user.lastCheck - currentTime);
         console.log("Interval:");
         console.log(user.interval);
         console.log(user.lastCheck - currentTime > user.interval);
         if (user.lastCheck - currentTime > user.interval) {
-          fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`, {
-            method: "GET",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("DATA: ", data);
-              if (data > user.thresholdValue) {
-                fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    email: user.email,
-                    trend: "Exchange Rate Above Minimum Threshold",
-                    exchangeRate: data,
-                  }),
-                })
-                  .then((response) => response.json())
-                  .then(async (data) => {
-                    console.log(data);
-                    await User.findOneAndUpdate(
-                      {
-                        email: user.email,
-                        thresholdValue: user.thresholdValue,
-                        interval: user.interval,
-                      },
-                      { $set: { lastCheck: currentTime } }
-                    );
-                  })
-                  .catch((error) => {
-                    console.error("Error:", error);
-                    alert("Failed to Send Email");
-                  });
+          const data = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`,
+            {
+              method: "GET",
+            }
+          ).then((response) => response.json());
+          if (data > user.thresholdValue) {
+            await fetch(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: user.email,
+                  trend: "Exchange Rate Above Minimum Threshold",
+                  exchangeRate: data,
+                }),
               }
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              alert("Failed to Get Exchange Rates");
-            });
+            );
+            await User.findOneAndUpdate(
+              { email: user.email },
+              { $set: { lastCheck: currentTime } }
+            );
+          }
         }
-      });
+      }
+      //   users.forEach((user) => {
+      //     console.log("Interval Difference");
+      //     console.log(user.lastCheck - currentTime);
+      //     console.log("Interval:");
+      //     console.log(user.interval);
+      //     console.log(user.lastCheck - currentTime > user.interval);
+      //     if (user.lastCheck - currentTime > user.interval) {
+      //       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper`, {
+      //         method: "GET",
+      //       })
+      //         .then((response) => response.json())
+      //         .then((data) => {
+      //           console.log("DATA: ", data);
+      //           if (data > user.thresholdValue) {
+      //             fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`, {
+      //               method: "POST",
+      //               headers: {
+      //                 "Content-Type": "application/json",
+      //               },
+      //               body: JSON.stringify({
+      //                 email: user.email,
+      //                 trend: "Exchange Rate Above Minimum Threshold",
+      //                 exchangeRate: data,
+      //               }),
+      //             })
+      //               .then((response) => response.json())
+      //               .then(async (data) => {
+      //                 console.log(data);
+      //                 await User.findOneAndUpdate(
+      //                   {
+      //                     email: user.email,
+      //                     thresholdValue: user.thresholdValue,
+      //                     interval: user.interval,
+      //                   },
+      //                   { $set: { lastCheck: currentTime } }
+      //                 );
+      //               })
+      //               .catch((error) => {
+      //                 console.error("Error:", error);
+      //               });
+      //           }
+      //         })
+      //         .catch((error) => {
+      //           console.error("Error:", error);
+      //         });
+      //     }
+      //   });
 
       return NextResponse.json(
         { success: true, message: "Rates Checked & Users Emailed as Needed" },
@@ -67,10 +98,8 @@ export async function GET() {
       );
     } else {
       return NextResponse.json(
-        {
-          error: "No Users Found to Check Rates For",
-        },
-        { status: 400 }
+        { success: true, skipped: true, message: "No users found" },
+        { status: 200 }
       );
     }
   } catch (error) {
