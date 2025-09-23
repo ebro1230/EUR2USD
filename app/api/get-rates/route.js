@@ -219,6 +219,11 @@ export async function GET() {
         exchangeRateTrendData.push(exchangeRate);
       }
 
+      await Model.findOneAndUpdate(
+        {},
+        { $set: { storedExchangeRates: exchangeRateTrendData } }
+      );
+
       if (!users.length) {
         console.log("No users found, skipping cron.");
         return NextResponse.json(
