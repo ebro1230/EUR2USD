@@ -207,24 +207,16 @@ export async function GET() {
         Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
       );
 
-      console.log("exchangeRateTrendData: ");
-      console.log(exchangeRateTrendData);
       if (!exchangeRateTrendData.length) {
         exchangeRateTrendData = [exchangeRate];
-        console.log("stored rates < 1");
-        console.log(exchangeRateTrendData);
       } else if (
         exchangeRateTrendData.length <= 192 &&
         exchangeRateTrendData.length > 0
       ) {
         exchangeRateTrendData.push(exchangeRate);
-        console.log("stored rates > 0 & < 192");
-        console.log(exchangeRateTrendData);
       } else {
         exchangeRateTrendData = exchangeRateTrendData.slice(1);
         exchangeRateTrendData.push(exchangeRate);
-        console.log("stored rates > 192");
-        console.log(exchangeRateTrendData);
       }
 
       await ExchangeRateTrendData.findOneAndUpdate(
