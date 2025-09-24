@@ -33,6 +33,7 @@
 .make-recurring-row{
   display:flex;
   justify-content: center;
+  margin: 0.5rem;
 }
 .exchange-rate-display-div{
   display: flex;
@@ -41,5 +42,11 @@
   justify-content: center;
 }
 .rate-buttons{
+  margin: 0.5rem;
+}
+.form-div{
+  width:80%;
+}
+.form-group{
   margin: 0.5rem;
 }

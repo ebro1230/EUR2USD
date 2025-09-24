@@ -179,10 +179,31 @@ export default function Home() {
 
   return (
     <div className="main-div">
-      <Form>
+      <div className="button-div">
+        <Button
+          variant="primary"
+          className="rate-buttons"
+          onClick={() => {
+            handleGetRateOnce();
+          }}
+        >
+          Get Exchange Rate
+        </Button>
+      </div>
+      {isLoading ? (
+        <LoadingIndicator />
+      ) : typeof exchangeRate === "number" ? (
+        <div className="exchange-rate-display-div">
+          <h3 className="exchange-rate">EUR to USD Exchange Rate: </h3>
+          <h3 className="exchange-rate">{`1€ = $${exchangeRate.toFixed(
+            5
+          )}`}</h3>
+        </div>
+      ) : null}
+      <Form className="form-div">
         <Row>
           <Form.Group
-            className="mb-3 make-recurring-row"
+            className="make-recurring-row"
             controlId="formTimeFrame"
             style={{ display: "flex" }}
           >
@@ -210,7 +231,7 @@ export default function Home() {
             <Row>
               <Form.Group
                 as={Col}
-                className="mb-3"
+                className="form-group"
                 controlId="formBasicEmail"
                 style={{ display: "flex", flexDirection: "column" }}
               >
@@ -237,7 +258,7 @@ export default function Home() {
               </Form.Group>
               <Form.Group
                 as={Col}
-                className="mb-3"
+                className="form-group"
                 controlId="formBasicEmail"
                 style={{ display: "flex", flexDirection: "column" }}
               >
@@ -262,7 +283,7 @@ export default function Home() {
               <Form.Label>Check Rates Every:</Form.Label>
             </Row>
             <Row>
-              <Form.Group as={Col}>
+              <Form.Group as={Col} className="form-group">
                 <Form.Label>{`Day(s):`}</Form.Label>
                 <Form.Select
                   name="days"
@@ -281,7 +302,7 @@ export default function Home() {
                   })}
                 </Form.Select>
               </Form.Group>
-              <Form.Group as={Col}>
+              <Form.Group as={Col} className="form-group">
                 <Form.Label>{`Hour(s):`}</Form.Label>
                 <Form.Select
                   name="hours"
@@ -303,7 +324,7 @@ export default function Home() {
                   <Form.Label className="error-message">{timeError}</Form.Label>
                 ) : null}
               </Form.Group>
-              <Form.Group as={Col}>
+              <Form.Group as={Col} className="form-group">
                 <Form.Label>{`Minute(s):`}</Form.Label>
                 <Form.Select
                   name="minutes"
@@ -325,7 +346,7 @@ export default function Home() {
             </Row>
             <Row>
               <Form.Group
-                className="mb-3 make-recurring-row"
+                className="make-recurring-row"
                 controlId="formTimeFrame"
                 style={{ display: "flex" }}
               >
@@ -363,27 +384,6 @@ export default function Home() {
           >
             Remove Recurring Emails
           </Button>
-        </div>
-      ) : null}
-      <div className="button-div">
-        <Button
-          variant="primary"
-          className="rate-buttons"
-          onClick={() => {
-            handleGetRateOnce();
-          }}
-        >
-          Get Exchange Rate
-        </Button>
-      </div>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : typeof exchangeRate === "number" ? (
-        <div className="exchange-rate-display-div">
-          <h3 className="exchange-rate">EUR to USD Exchange Rate: </h3>
-          <h3 className="exchange-rate">{`1€ = $${exchangeRate.toFixed(
-            5
-          )}`}</h3>
         </div>
       ) : null}
       <ToastContainer position="middle-center" className="p-3">
