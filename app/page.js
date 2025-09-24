@@ -301,8 +301,14 @@ export default function Home() {
               </Form.Group>
             </Row>
             <Row>
-              <Form.Group as={Col} className="form-group">
-                <Form.Label>Check Rates Every:</Form.Label>
+              <Form.Group
+                as={Col}
+                className="form-group"
+                style={{ marginBottom: "0rem" }}
+              >
+                <Form.Label style={{ marginBottom: "0rem" }}>
+                  Check Rates Every:
+                </Form.Label>
               </Form.Group>
             </Row>
             <Row>
