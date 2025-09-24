@@ -22,6 +22,7 @@ export default function Home() {
   const [requestStatus, setRequestStatus] = useState("");
   const [toastIcon, setToastIcon] = useState("");
   const [emailTrend, setEmailTrend] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(0);
 
   const emailCheck = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const thresholdCheck =
@@ -175,6 +176,15 @@ export default function Home() {
     if (!exchangeRate) {
       handleGetRateOnce();
     }
+
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -200,7 +210,7 @@ export default function Home() {
           )}`}</h3>
         </div>
       ) : null}
-      <Form className="form-div">
+      <Form style={{ width: screenWidth <= 576 ? "100%" : "50%" }}>
         <Row>
           <Form.Group
             className="make-recurring-row"
