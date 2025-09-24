@@ -189,6 +189,16 @@ export default function Home() {
 
   return (
     <div className="main-div">
+      {isLoading ? (
+        <LoadingIndicator />
+      ) : typeof exchangeRate === "number" ? (
+        <div className="exchange-rate-display-div">
+          <h2 className="exchange-rate">EUR to USD Exchange Rate: </h2>
+          <h4 className="exchange-rate">{`1€ = $${exchangeRate.toFixed(
+            5
+          )}`}</h4>
+        </div>
+      ) : null}
       <div className="button-div">
         <Button
           variant="primary"
@@ -200,20 +210,16 @@ export default function Home() {
           Get Exchange Rate
         </Button>
       </div>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : typeof exchangeRate === "number" ? (
-        <div className="exchange-rate-display-div">
-          <h3 className="exchange-rate">EUR to USD Exchange Rate: </h3>
-          <h3 className="exchange-rate">{`1€ = $${exchangeRate.toFixed(
-            5
-          )}`}</h3>
-        </div>
-      ) : null}
       <Form
         style={{
           width:
-            screenWidth <= 576 ? "95%" : screenWidth <= 1000 ? "75%" : "50%",
+            screenWidth <= 576
+              ? "95%"
+              : screenWidth <= 1000
+              ? "75%"
+              : screenWidth <= 729
+              ? "85%"
+              : "50%",
         }}
       >
         <Row>
@@ -359,7 +365,7 @@ export default function Home() {
                 </Form.Select>
               </Form.Group>
             </Row>
-            <Row>
+            <Row style={{ marginTop: "1rem" }}>
               <Form.Group
                 className="make-recurring-row"
                 controlId="formTimeFrame"
