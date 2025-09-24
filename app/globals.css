@@ -9,7 +9,6 @@
 }
 .exchange-rate{
   color:black;
-  font-size: clamp(8px, 1.2vw, 16px);
 }
 .button-div{
   display: flex;
@@ -20,7 +19,6 @@
 }
 .error-message{
   color:red;
-  font-size: clamp(8px, 1.2vw, 16px);
 }
 .recurring-div{
   display: flex;
