@@ -301,7 +301,9 @@ export default function Home() {
               </Form.Group>
             </Row>
             <Row>
-              <Form.Label>Check Rates Every:</Form.Label>
+              <Form.Group as={Col} className="form-group">
+                <Form.Label>Check Rates Every:</Form.Label>
+              </Form.Group>
             </Row>
             <Row>
               <Form.Group as={Col} className="form-group">
