@@ -377,6 +377,7 @@ export default function Home() {
                   type="checkbox"
                   id={`Also Send Exchange Rate Trend Notifications`}
                   label={`Also Send Exchange Rate Trend Notifications`}
+                  style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
                   onChange={(e) => {
                     setEmailTrend(e.target.checked);
                   }}
@@ -391,7 +392,7 @@ export default function Home() {
           <Button
             variant="success"
             className="rate-buttons"
-            style={{ fontSize: screenWidth <= 405 ? "1rem" : null }}
+            style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
             onClick={() => {
               handleRecurringEmailRequest();
             }}
@@ -405,7 +406,7 @@ export default function Home() {
             onClick={() => {
               handleDeleteRecurringEmailRequests();
             }}
-            style={{ fontSize: screenWidth <= 405 ? "1rem" : null }}
+            style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
           >
             Remove Recurring Emails
           </Button>
