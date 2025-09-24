@@ -210,7 +210,12 @@ export default function Home() {
           )}`}</h3>
         </div>
       ) : null}
-      <Form style={{ width: screenWidth <= 576 ? "100%" : "50%" }}>
+      <Form
+        style={{
+          width:
+            screenWidth <= 576 ? "95%" : screenWidth <= 1000 ? "75%" : "50%",
+        }}
+      >
         <Row>
           <Form.Group
             className="make-recurring-row"
@@ -378,6 +383,7 @@ export default function Home() {
           <Button
             variant="success"
             className="rate-buttons"
+            style={{ fontSize: screenWidth <= 405 ? "1rem" : null }}
             onClick={() => {
               handleRecurringEmailRequest();
             }}
@@ -391,6 +397,7 @@ export default function Home() {
             onClick={() => {
               handleDeleteRecurringEmailRequests();
             }}
+            style={{ fontSize: screenWidth <= 405 ? "1rem" : null }}
           >
             Remove Recurring Emails
           </Button>
