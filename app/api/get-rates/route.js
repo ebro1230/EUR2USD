@@ -138,7 +138,7 @@ export async function GET() {
           ) {
             if (intervalDifference >= user.interval - 1000 * 60 * 3) {
               await User.findOneAndUpdate(
-                { email: user.email },
+                { email: user.email, to: user.to, from: user.from },
                 { $set: { lastCheck: currentTime } }
               );
               try {
@@ -271,7 +271,7 @@ export async function GET() {
           ) {
             if (intervalDifference >= user.interval - 1000 * 60 * 3) {
               await User.findOneAndUpdate(
-                { email: user.email },
+                { email: user.email, to: user.to, from: user.from },
                 { $set: { lastCheck: currentTime } }
               );
               try {
