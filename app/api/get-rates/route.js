@@ -256,7 +256,7 @@ export async function GET() {
           }
 
           await ExchangeRateTrendData.findOneAndUpdate(
-            { from: user.from, to: user.to },
+            { from: newRateData.from, to: newRateData.to },
             { $set: { storedExchangeRates: exchangeRateTrendData } }
           );
           const trend = handleTrendCalculation(exchangeRateTrendData);
