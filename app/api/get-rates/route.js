@@ -90,49 +90,79 @@ export async function GET() {
 
     // Loop over users sequentially to handle async calls safely
     for (const user of users) {
-      let exchangeRateTrendData = await ExchangeRateTrendData.findOne({
+      const existingRateData = await ExchangeRateTrendData.find({
         from: user.from,
         to: user.to,
       });
-      exchangeRateTrendData = exchangeRateTrendData.storedExchangeRates;
-      try {
-        // Fetch exchange rate
-        const scraperResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio?from=${user.from}&to=${user.to}`
-        );
-        const rateData = await scraperResponse.json();
-        const exchangeRate = Number(
-          Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
-        );
+      if (existingRateData) {
+        let exchangeRateTrendData = existingRateData.storedExchangeRates;
+        try {
+          // Fetch exchange rate
+          const scraperResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio?from=${user.from}&to=${user.to}`
+          );
+          const rateData = await scraperResponse.json();
+          const exchangeRate = Number(
+            Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
+          );
 
-        if (!exchangeRateTrendData.length) {
-          exchangeRateTrendData = [exchangeRate];
-        } else if (
-          exchangeRateTrendData.length <= 192 &&
-          exchangeRateTrendData.length > 0
-        ) {
-          exchangeRateTrendData.push(exchangeRate);
-        } else {
-          exchangeRateTrendData = exchangeRateTrendData.slice(1);
-          exchangeRateTrendData.push(exchangeRate);
-        }
+          if (!exchangeRateTrendData.length) {
+            exchangeRateTrendData = [exchangeRate];
+          } else if (
+            exchangeRateTrendData.length <= 192 &&
+            exchangeRateTrendData.length > 0
+          ) {
+            exchangeRateTrendData.push(exchangeRate);
+          } else {
+            exchangeRateTrendData = exchangeRateTrendData.slice(1);
+            exchangeRateTrendData.push(exchangeRate);
+          }
 
-        await ExchangeRateTrendData.findOneAndUpdate(
-          {},
-          { $set: { storedExchangeRates: exchangeRateTrendData } }
-        );
-        const trend = handleTrendCalculation(exchangeRateTrendData);
-        const intervalDifference = currentTime - user.lastCheck;
+          await ExchangeRateTrendData.findOneAndUpdate(
+            { from: user.from, to: user.to },
+            { $set: { storedExchangeRates: exchangeRateTrendData } }
+          );
+          const trend = handleTrendCalculation(exchangeRateTrendData);
+          const intervalDifference = currentTime - user.lastCheck;
 
-        if (
-          (exchangeRate >= user.thresholdValue && trend.trend === "neutral") ||
-          (exchangeRate >= user.thresholdValue && !user.trendNotifications)
-        ) {
-          if (intervalDifference >= user.interval - 1000 * 60 * 3) {
-            await User.findOneAndUpdate(
-              { email: user.email },
-              { $set: { lastCheck: currentTime } }
-            );
+          if (
+            (exchangeRate >= user.thresholdValue &&
+              trend.trend === "neutral") ||
+            (exchangeRate >= user.thresholdValue && !user.trendNotifications)
+          ) {
+            if (intervalDifference >= user.interval - 1000 * 60 * 3) {
+              await User.findOneAndUpdate(
+                { email: user.email },
+                { $set: { lastCheck: currentTime } }
+              );
+              try {
+                // Send email
+                const emailResponse = await fetch(
+                  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: user.email,
+                      trend: "Exchange Rate Above Minimum Threshold",
+                      exchangeRate: exchangeRate,
+                    }),
+                  }
+                );
+
+                const emailResult = await emailResponse.json();
+                console.log("Email sent:", emailResult);
+
+                // Update lastCheck
+              } catch (emailError) {
+                console.error("Error sending email:", emailError);
+              }
+            }
+          } else if (
+            exchangeRate >= user.thresholdValue &&
+            trend.trend !== "neutral" &&
+            user.trendNotifications
+          ) {
             try {
               // Send email
               const emailResponse = await fetch(
@@ -142,7 +172,34 @@ export async function GET() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     email: user.email,
-                    trend: "Exchange Rate Above Minimum Threshold",
+                    trend: `Exchange Rate Above Minimum Threshold & ${trend.message}`,
+                    exchangeRate: exchangeRate,
+                  }),
+                }
+              );
+
+              const emailResult = await emailResponse.json();
+              console.log("Email sent:", emailResult);
+
+              // Update lastCheck
+            } catch (emailError) {
+              console.error("Error sending email:", emailError);
+            }
+          } else if (
+            exchangeRate < user.thresholdValue &&
+            trend.trend !== "neutral" &&
+            user.trendNotifications
+          ) {
+            try {
+              // Send email
+              const emailResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: user.email,
+                    trend: trend.message,
                     exchangeRate: exchangeRate,
                   }),
                 }
@@ -156,70 +213,142 @@ export async function GET() {
               console.error("Error sending email:", emailError);
             }
           }
-        } else if (
-          exchangeRate >= user.thresholdValue &&
-          trend.trend !== "neutral" &&
-          user.trendNotifications
-        ) {
-          try {
-            // Send email
-            const emailResponse = await fetch(
-              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: user.email,
-                  trend: `Exchange Rate Above Minimum Threshold & ${trend.message}`,
-                  exchangeRate: exchangeRate,
-                }),
-              }
-            );
-
-            const emailResult = await emailResponse.json();
-            console.log("Email sent:", emailResult);
-
-            // Update lastCheck
-          } catch (emailError) {
-            console.error("Error sending email:", emailError);
-          }
-        } else if (
-          exchangeRate < user.thresholdValue &&
-          trend.trend !== "neutral" &&
-          user.trendNotifications
-        ) {
-          try {
-            // Send email
-            const emailResponse = await fetch(
-              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: user.email,
-                  trend: trend.message,
-                  exchangeRate: exchangeRate,
-                }),
-              }
-            );
-
-            const emailResult = await emailResponse.json();
-            console.log("Email sent:", emailResult);
-
-            // Update lastCheck
-          } catch (emailError) {
-            console.error("Error sending email:", emailError);
-          }
+        } catch (scraperError) {
+          console.error("Error fetching rates:", scraperError);
         }
-      } catch (scraperError) {
-        console.error("Error fetching rates:", scraperError);
-      }
-    }
+      } else {
+        const newRateData = await ExchangeRateTrendData.create({
+          storedExchangeRates: [],
+          from: user.from,
+          to: user.to,
+        });
+        let exchangeRateTrendData = newRateData.storedExchangeRates;
+        try {
+          // Fetch exchange rate
+          const scraperResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio?from=${user.from}&to=${user.to}`
+          );
+          const rateData = await scraperResponse.json();
+          const exchangeRate = Number(
+            Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
+          );
 
-    return NextResponse.json(
-      { success: true, message: "Rates checked & users emailed as needed" },
-      { status: 200 }
-    );
+          if (!exchangeRateTrendData.length) {
+            exchangeRateTrendData = [exchangeRate];
+          } else if (
+            exchangeRateTrendData.length <= 192 &&
+            exchangeRateTrendData.length > 0
+          ) {
+            exchangeRateTrendData.push(exchangeRate);
+          } else {
+            exchangeRateTrendData = exchangeRateTrendData.slice(1);
+            exchangeRateTrendData.push(exchangeRate);
+          }
+
+          await ExchangeRateTrendData.findOneAndUpdate(
+            { from: user.from, to: user.to },
+            { $set: { storedExchangeRates: exchangeRateTrendData } }
+          );
+          const trend = handleTrendCalculation(exchangeRateTrendData);
+          const intervalDifference = currentTime - user.lastCheck;
+
+          if (
+            (exchangeRate >= user.thresholdValue &&
+              trend.trend === "neutral") ||
+            (exchangeRate >= user.thresholdValue && !user.trendNotifications)
+          ) {
+            if (intervalDifference >= user.interval - 1000 * 60 * 3) {
+              await User.findOneAndUpdate(
+                { email: user.email },
+                { $set: { lastCheck: currentTime } }
+              );
+              try {
+                // Send email
+                const emailResponse = await fetch(
+                  `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      email: user.email,
+                      trend: "Exchange Rate Above Minimum Threshold",
+                      exchangeRate: exchangeRate,
+                    }),
+                  }
+                );
+
+                const emailResult = await emailResponse.json();
+                console.log("Email sent:", emailResult);
+
+                // Update lastCheck
+              } catch (emailError) {
+                console.error("Error sending email:", emailError);
+              }
+            }
+          } else if (
+            exchangeRate >= user.thresholdValue &&
+            trend.trend !== "neutral" &&
+            user.trendNotifications
+          ) {
+            try {
+              // Send email
+              const emailResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: user.email,
+                    trend: `Exchange Rate Above Minimum Threshold & ${trend.message}`,
+                    exchangeRate: exchangeRate,
+                  }),
+                }
+              );
+
+              const emailResult = await emailResponse.json();
+              console.log("Email sent:", emailResult);
+
+              // Update lastCheck
+            } catch (emailError) {
+              console.error("Error sending email:", emailError);
+            }
+          } else if (
+            exchangeRate < user.thresholdValue &&
+            trend.trend !== "neutral" &&
+            user.trendNotifications
+          ) {
+            try {
+              // Send email
+              const emailResponse = await fetch(
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/send-email`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: user.email,
+                    trend: trend.message,
+                    exchangeRate: exchangeRate,
+                  }),
+                }
+              );
+
+              const emailResult = await emailResponse.json();
+              console.log("Email sent:", emailResult);
+
+              // Update lastCheck
+            } catch (emailError) {
+              console.error("Error sending email:", emailError);
+            }
+          }
+        } catch (scraperError) {
+          console.error("Error fetching rates:", scraperError);
+        }
+      }
+      return NextResponse.json(
+        { success: true, message: "Rates checked & users emailed as needed" },
+        { status: 200 }
+      );
+    }
   } catch (error) {
     console.error("Unexpected error while getting rates:", error);
     return NextResponse.json(
