@@ -37,6 +37,7 @@ export default function Home() {
     21, 22, 23,
   ];
   const minutesRange = [0, 15, 30, 45];
+  console.log("small change");
 
   const handleRecurringEmailRequest = () => {
     if (minutes == "0" && hours == "0" && days == "0") {
