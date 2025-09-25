@@ -40,7 +40,6 @@ export default function Home() {
     21, 22, 23,
   ];
   const minutesRange = [0, 15, 30, 45];
-  console.log("small change");
 
   const currencyChoices = [
     "USD (United States Dollar)",
