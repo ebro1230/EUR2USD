@@ -394,6 +394,10 @@ export default function Home() {
                   <Form.Select
                     name="from"
                     onChange={(e) => {
+                      if (e.target.value === to) {
+                        setTo(from);
+                        handleChangeCurrencySymbol("to", from.slice(0, 3));
+                      }
                       setFrom(e.target.value);
 
                       handleChangeCurrencySymbol(
@@ -408,7 +412,7 @@ export default function Home() {
                         <option
                           key={`from+${currency}`}
                           value={currency}
-                          disabled={currency === to}
+                          //disabled={currency === to}
                         >
                           {currency}
                         </option>
@@ -421,7 +425,12 @@ export default function Home() {
                   <Form.Select
                     name="to"
                     onChange={(e) => {
+                      if (e.target.value === from) {
+                        setFrom(to);
+                        handleChangeCurrencySymbol("from", to.slice(0, 3));
+                      }
                       setTo(e.target.value);
+
                       handleChangeCurrencySymbol(
                         "to",
                         e.target.value.slice(0, 3)
@@ -434,7 +443,7 @@ export default function Home() {
                         <option
                           key={`to+${currency}`}
                           value={currency}
-                          disabled={currency === from}
+                          //disabled={currency === from}
                         >
                           {currency}
                         </option>
@@ -452,7 +461,52 @@ export default function Home() {
                   0,
                   3
                 )} to ${to.slice(0, 3)} Exchange Rate: `}</h2>
-                <h4 className="exchange-rate">{`1${fromSymbol} = ${toSymbol}${exchangeRate}`}</h4>
+                <h4 className="exchange-rate">
+                  {(fromSymbol === "$" ||
+                    fromSymbol === "R$" ||
+                    fromSymbol === "£" ||
+                    fromSymbol === "¥" ||
+                    fromSymbol === "₹" ||
+                    fromSymbol === "Rp" ||
+                    fromSymbol === "₪" ||
+                    fromSymbol === "RM" ||
+                    fromSymbol === "CHF" ||
+                    fromSymbol === "₺") &&
+                  (toSymbol === "$" ||
+                    toSymbol === "R$" ||
+                    toSymbol === "£" ||
+                    toSymbol === "¥" ||
+                    toSymbol === "₹" ||
+                    toSymbol === "Rp" ||
+                    toSymbol === "₪" ||
+                    toSymbol === "RM" ||
+                    toSymbol === "CHF" ||
+                    toSymbol === "₺")
+                    ? `${fromSymbol}1 = ${toSymbol}${exchangeRate}`
+                    : toSymbol === "$" ||
+                      toSymbol === "R$" ||
+                      toSymbol === "£" ||
+                      toSymbol === "¥" ||
+                      toSymbol === "₹" ||
+                      toSymbol === "Rp" ||
+                      toSymbol === "₪" ||
+                      toSymbol === "RM" ||
+                      toSymbol === "CHF" ||
+                      toSymbol === "₺"
+                    ? `1${fromSymbol} = ${toSymbol}${exchangeRate}`
+                    : fromSymbol === "$" ||
+                      fromSymbol === "R$" ||
+                      fromSymbol === "£" ||
+                      fromSymbol === "¥" ||
+                      fromSymbol === "₹" ||
+                      fromSymbol === "Rp" ||
+                      fromSymbol === "₪" ||
+                      fromSymbol === "RM" ||
+                      fromSymbol === "CHF" ||
+                      fromSymbol === "₺"
+                    ? `${fromSymbol}1 = ${exchangeRate}${toSymbol}`
+                    : `1${fromSymbol} = ${exchangeRate}${toSymbol}`}
+                </h4>
               </div>
             ) : null}
             <div className="button-div">
