@@ -79,45 +79,49 @@ export async function GET() {
 
     // Fetch all users
     const users = await User.find({});
-    let exchangeRateTrendData = await ExchangeRateTrendData.findOne({});
-    exchangeRateTrendData = exchangeRateTrendData.storedExchangeRates;
-    try {
-      // Fetch exchange rate
-      const scraperResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio`
-      );
-      const rateData = await scraperResponse.json();
-      const exchangeRate = Number(
-        Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
-      );
 
-      if (!exchangeRateTrendData.length) {
-        exchangeRateTrendData = [exchangeRate];
-      } else if (
-        exchangeRateTrendData.length <= 192 &&
-        exchangeRateTrendData.length > 0
-      ) {
-        exchangeRateTrendData.push(exchangeRate);
-      } else {
-        exchangeRateTrendData = exchangeRateTrendData.slice(1);
-        exchangeRateTrendData.push(exchangeRate);
-      }
-
-      await ExchangeRateTrendData.findOneAndUpdate(
-        {},
-        { $set: { storedExchangeRates: exchangeRateTrendData } }
+    if (!users.length) {
+      console.log("No users found, skipping cron.");
+      return NextResponse.json(
+        { success: true, skipped: true, message: "No users found" },
+        { status: 200 }
       );
+    }
 
-      if (!users.length) {
-        console.log("No users found, skipping cron.");
-        return NextResponse.json(
-          { success: true, skipped: true, message: "No users found" },
-          { status: 200 }
+    // Loop over users sequentially to handle async calls safely
+    for (const user of users) {
+      let exchangeRateTrendData = await ExchangeRateTrendData.findOne({
+        from: user.from,
+        to: user.to,
+      });
+      exchangeRateTrendData = exchangeRateTrendData.storedExchangeRates;
+      try {
+        // Fetch exchange rate
+        const scraperResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio?from=${user.from}&to=${user.to}`
         );
-      }
-      const trend = handleTrendCalculation(exchangeRateTrendData);
-      // Loop over users sequentially to handle async calls safely
-      for (const user of users) {
+        const rateData = await scraperResponse.json();
+        const exchangeRate = Number(
+          Number(Number(rateData.replace(/,/g, "")) / 1000).toFixed(5)
+        );
+
+        if (!exchangeRateTrendData.length) {
+          exchangeRateTrendData = [exchangeRate];
+        } else if (
+          exchangeRateTrendData.length <= 192 &&
+          exchangeRateTrendData.length > 0
+        ) {
+          exchangeRateTrendData.push(exchangeRate);
+        } else {
+          exchangeRateTrendData = exchangeRateTrendData.slice(1);
+          exchangeRateTrendData.push(exchangeRate);
+        }
+
+        await ExchangeRateTrendData.findOneAndUpdate(
+          {},
+          { $set: { storedExchangeRates: exchangeRateTrendData } }
+        );
+        const trend = handleTrendCalculation(exchangeRateTrendData);
         const intervalDifference = currentTime - user.lastCheck;
 
         if (
@@ -207,9 +211,9 @@ export async function GET() {
             console.error("Error sending email:", emailError);
           }
         }
+      } catch (scraperError) {
+        console.error("Error fetching rates:", scraperError);
       }
-    } catch (scraperError) {
-      console.error("Error fetching rates:", scraperError);
     }
 
     return NextResponse.json(
@@ -217,7 +221,7 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Unexpected error in /api/get-rates:", error);
+    console.error("Unexpected error while getting rates:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }

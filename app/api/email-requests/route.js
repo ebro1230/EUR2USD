@@ -11,6 +11,8 @@ export async function POST(req) {
       email: body.email,
       thresholdValue: body.thresholdValue,
       interval: body.interval,
+      from: body.from,
+      to: body.to,
     });
     if (existingUser) {
       return NextResponse.json(
@@ -31,11 +33,13 @@ export async function POST(req) {
         lastCheck: new Date(),
         thresholdValue: body.thresholdValue,
         trendNotifications: body.trendNotifications,
+        from: body.from,
+        to: body.to,
       });
       return NextResponse.json(
         {
           success: true,
-          message: `Recurring Email Request created for ${newUser.email} when the euro is valued greater than or equal to $${newUser.thresholdValue}, checking every ${newUser.days} days, ${newUser.hours} hours, and ${newUser.minutes} minutes`,
+          message: `Recurring Email Request created for ${newUser.email} when the euro is valued greater than or equal to $${newUser.thresholdValue}, checking the exchange rate between ${newUser.from} & ${newUser.to} every ${newUser.days} days, ${newUser.hours} hours, and ${newUser.minutes} minutes`,
         },
         { status: 200 }
       );
