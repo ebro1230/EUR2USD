@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "EUR2USD",
+  title: "ExchangeRate",
   description:
     "Generates email based on self made algorithm & user provided options",
 };
