@@ -1,5 +1,5 @@
 {
-  "name": "EUR2USD",
+  "name": "ExchangeRate",
   "version": "0.1.0",
   "private": true,
   "scripts": {
