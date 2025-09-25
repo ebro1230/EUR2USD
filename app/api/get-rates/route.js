@@ -94,8 +94,7 @@ export async function GET() {
         from: user.from.slice(0, 3),
         to: user.to.slice(0, 3),
       });
-      console.log("EXISTING RATE DATA");
-      console.log(existingRateData);
+
       if (existingRateData) {
         let exchangeRateTrendData = existingRateData.storedExchangeRates;
         try {
@@ -121,7 +120,7 @@ export async function GET() {
           }
 
           await ExchangeRateTrendData.findOneAndUpdate(
-            { from: user.from, to: user.to },
+            { from: user.from.slice(0, 3), to: user.to.slice(0, 3) },
             { $set: { storedExchangeRates: exchangeRateTrendData } }
           );
           const trend = handleTrendCalculation(exchangeRateTrendData);
@@ -231,8 +230,6 @@ export async function GET() {
           to: user.to.slice(0, 3),
         });
         let exchangeRateTrendData = newRateData.storedExchangeRates;
-        console.log("NEW RATE DATA");
-        console.log(newRateData);
         try {
           // Fetch exchange rate
           const scraperResponse = await fetch(
