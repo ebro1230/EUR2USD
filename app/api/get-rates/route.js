@@ -100,7 +100,12 @@ export async function GET() {
         try {
           // Fetch exchange rate
           const scraperResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/scraper-cheerio?from=${user.from}&to=${user.to}`
+            `${
+              process.env.NEXT_PUBLIC_BACKEND_URL
+            }/api/scraper-cheerio?from=${user.from.slice(
+              0,
+              3
+            )}&to=${user.to.slice(0, 3)}`
           );
           const rateData = await scraperResponse.json();
           const exchangeRate = Number(
