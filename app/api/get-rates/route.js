@@ -90,9 +90,9 @@ export async function GET() {
 
     // Loop over users sequentially to handle async calls safely
     for (const user of users) {
-      const existingRateData = await ExchangeRateTrendData.find({
-        from: user.from,
-        to: user.to,
+      const existingRateData = await ExchangeRateTrendData.findOne({
+        from: user.from.slice(0, 3),
+        to: user.to.slice(0, 3),
       });
       console.log("EXISTING RATE DATA");
       console.log(existingRateData);
