@@ -360,11 +360,11 @@ export async function GET() {
           console.error("Error fetching rates:", scraperError);
         }
       }
-      return NextResponse.json(
-        { success: true, message: "Rates checked & users emailed as needed" },
-        { status: 200 }
-      );
     }
+    return NextResponse.json(
+      { success: true, message: "Rates checked & users emailed as needed" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Unexpected error while getting rates:", error);
     return NextResponse.json(
