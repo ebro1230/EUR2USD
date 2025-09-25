@@ -227,12 +227,12 @@ export async function GET() {
       } else {
         const newRateData = await ExchangeRateTrendData.create({
           storedExchangeRates: [],
-          from: user.from,
-          to: user.to,
+          from: user.from.slice(0, 3),
+          to: user.to.slice(0, 3),
         });
         let exchangeRateTrendData = newRateData.storedExchangeRates;
         console.log("NEW RATE DATA");
-        console.log(existingRateData);
+        console.log(newRateData);
         try {
           // Fetch exchange rate
           const scraperResponse = await fetch(
