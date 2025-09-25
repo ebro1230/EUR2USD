@@ -27,6 +27,7 @@ export default function Home() {
   const [to, setTo] = useState("USD (United States Dollar)");
   const [fromSymbol, setFromSymbol] = useState("€");
   const [toSymbol, setToSymbol] = useState("$");
+  const [isEmailRequestActive, setIsEmailRequestActive] = useState(false);
 
   const emailCheck = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const thresholdCheck = /^(?:\d+)(?:\.\d{1,5})?$/;
@@ -91,6 +92,7 @@ export default function Home() {
       thresholdCheck.test(thresholdValue) &&
       (minutes != "0" || hours != "0" || days != "0")
     ) {
+      setIsEmailRequestActive(true);
       fetch(`/api/email-requests`, {
         method: "POST",
         headers: {
@@ -135,6 +137,22 @@ export default function Home() {
             );
           }
           setShowToast(true);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setToastMessage("Failed to Set Recurring Email Request");
+          setRequestStatus("Request Error");
+          setToastIcon(
+            <i
+              className="bi bi-x-square-fill"
+              style={{ color: "red", marginRight: "1rem" }}
+            ></i>
+          );
+
+          setShowToast(true);
+        })
+        .finally(() => {
+          setIsEmailRequestActive(false);
         });
     }
   };
@@ -143,6 +161,7 @@ export default function Home() {
     if (!emailCheck.test(email)) {
       setEmailError("Please Enter a Valid Email");
     } else {
+      setIsEmailRequestActive(true);
       fetch(`/api/email-requests`, {
         method: "DELETE",
         headers: {
@@ -174,6 +193,22 @@ export default function Home() {
             );
           }
           setShowToast(true);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setToastMessage("Failed to Delete Emails");
+          setRequestStatus("Request Error");
+          setToastIcon(
+            <i
+              className="bi bi-x-square-fill"
+              style={{ color: "red", marginRight: "1rem" }}
+            ></i>
+          );
+
+          setShowToast(true);
+        })
+        .finally(() => {
+          setIsEmailRequestActive(false);
         });
     }
   };
@@ -333,322 +368,339 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, [from, to]);
 
-  console.log("TO: ", to);
-  console.log("FROM: ", from);
   return (
     <div className="main-div">
-      <Form
-        style={{
-          width:
-            screenWidth <= 576
-              ? "95%"
-              : screenWidth <= 1000
-              ? "75%"
-              : screenWidth <= 729
-              ? "85%"
-              : "50%",
-        }}
-      >
-        <Row>
-          <Form.Group as={Col} className="form-group">
-            <Form.Label>{`Convert From:`}</Form.Label>
-            <Form.Select
-              name="from"
-              onChange={(e) => {
-                setFrom(e.target.value);
-
-                handleChangeCurrencySymbol("from", e.target.value.slice(0, 3));
+      <>
+        <h1 className="title">Exchange Rate Calculator</h1>
+        {isEmailRequestActive ? (
+          <LoadingIndicator />
+        ) : (
+          <>
+            <Form
+              style={{
+                width:
+                  screenWidth <= 576
+                    ? "95%"
+                    : screenWidth <= 1000
+                    ? "75%"
+                    : screenWidth <= 729
+                    ? "85%"
+                    : "50%",
               }}
-              value={from}
             >
-              {currencyChoices.map((currency) => {
-                return (
-                  <option
-                    key={`from+${currency}`}
-                    value={currency}
-                    disabled={currency === to}
-                  >
-                    {currency}
-                  </option>
-                );
-              })}
-            </Form.Select>
-          </Form.Group>
-          <Form.Group as={Col} className="form-group">
-            <Form.Label>{`Convert To:`}</Form.Label>
-            <Form.Select
-              name="to"
-              onChange={(e) => {
-                setTo(e.target.value);
-                handleChangeCurrencySymbol("to", e.target.value.slice(0, 3));
-              }}
-              value={to}
-            >
-              {currencyChoices.map((currency) => {
-                return (
-                  <option
-                    key={`to+${currency}`}
-                    value={currency}
-                    disabled={currency === from}
-                  >
-                    {currency}
-                  </option>
-                );
-              })}
-            </Form.Select>
-          </Form.Group>
-        </Row>
-      </Form>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : typeof exchangeRate === "number" ? (
-        <div className="exchange-rate-display-div">
-          <h2 className="exchange-rate">{`${from.slice(0, 3)} to ${to.slice(
-            0,
-            3
-          )} Exchange Rate: `}</h2>
-          <h4 className="exchange-rate">{`1${fromSymbol} = ${toSymbol}${exchangeRate}`}</h4>
-        </div>
-      ) : null}
-      <div className="button-div">
-        <Button
-          variant="primary"
-          className="rate-buttons"
-          onClick={() => {
-            handleGetRateOnce();
-          }}
-        >
-          Get Exchange Rate
-        </Button>
-      </div>
-      <Form
-        style={{
-          width:
-            screenWidth <= 576
-              ? "95%"
-              : screenWidth <= 1000
-              ? "75%"
-              : screenWidth <= 729
-              ? "85%"
-              : "50%",
-        }}
-      >
-        <Row>
-          <Form.Group
-            className="make-recurring-row"
-            controlId="formTimeFrame"
-            style={{ display: "flex" }}
-          >
-            <Form.Check // prettier-ignore
-              type="checkbox"
-              id={`Set Recurring Email Notifications`}
-              label={`Set Recurring Email Notifications`}
-              onChange={(e) => {
-                setMakeRecurring(e.target.checked);
-                setTimeError("");
-                setThresholdValueError("");
-                setEmailError("");
-                setEmail("");
-                setThresholdValue("");
-                setDays("0");
-                setHours("0");
-                setMinutes("0");
-              }}
-            />
-          </Form.Group>
-        </Row>
+              <Row>
+                <Form.Group as={Col} className="form-group">
+                  <Form.Label>{`Convert From:`}</Form.Label>
+                  <Form.Select
+                    name="from"
+                    onChange={(e) => {
+                      setFrom(e.target.value);
 
-        {makeRecurring ? (
-          <Row>
-            <Row>
-              <Form.Group
-                as={Col}
-                className="form-group"
-                controlId="formBasicEmail"
-                style={{ display: "flex", flexDirection: "column" }}
+                      handleChangeCurrencySymbol(
+                        "from",
+                        e.target.value.slice(0, 3)
+                      );
+                    }}
+                    value={from}
+                  >
+                    {currencyChoices.map((currency) => {
+                      return (
+                        <option
+                          key={`from+${currency}`}
+                          value={currency}
+                          disabled={currency === to}
+                        >
+                          {currency}
+                        </option>
+                      );
+                    })}
+                  </Form.Select>
+                </Form.Group>
+                <Form.Group as={Col} className="form-group">
+                  <Form.Label>{`Convert To:`}</Form.Label>
+                  <Form.Select
+                    name="to"
+                    onChange={(e) => {
+                      setTo(e.target.value);
+                      handleChangeCurrencySymbol(
+                        "to",
+                        e.target.value.slice(0, 3)
+                      );
+                    }}
+                    value={to}
+                  >
+                    {currencyChoices.map((currency) => {
+                      return (
+                        <option
+                          key={`to+${currency}`}
+                          value={currency}
+                          disabled={currency === from}
+                        >
+                          {currency}
+                        </option>
+                      );
+                    })}
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+            </Form>
+            {isLoading ? (
+              <LoadingIndicator />
+            ) : typeof exchangeRate === "number" ? (
+              <div className="exchange-rate-display-div">
+                <h2 className="exchange-rate-title">{`${from.slice(
+                  0,
+                  3
+                )} to ${to.slice(0, 3)} Exchange Rate: `}</h2>
+                <h4 className="exchange-rate">{`1${fromSymbol} = ${toSymbol}${exchangeRate}`}</h4>
+              </div>
+            ) : null}
+            <div className="button-div">
+              <Button
+                variant="primary"
+                className="rate-buttons"
+                onClick={() => {
+                  handleGetRateOnce();
+                }}
               >
-                <Form.Label>Email address:</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="JohnDoe@example.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setEmailError("");
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleExecute(email, Number(thresholdValue));
-                    }
-                  }}
-                />
-                {emailError ? (
-                  <Form.Label className="error-message">
-                    {emailError}
-                  </Form.Label>
-                ) : null}
-              </Form.Group>
-              <Form.Group
-                as={Col}
-                className="form-group"
-                controlId="formBasicEmail"
-                style={{ display: "flex", flexDirection: "column" }}
-              >
-                <Form.Label>Threshold Value:</Form.Label>
-                <Form.Control
-                  type="input"
-                  placeholder={`${toSymbol}1.21`}
-                  value={
-                    thresholdValue
-                      ? `${toSymbol}${thresholdValue}`
-                      : `${toSymbol}`
-                  }
-                  onChange={(e) => {
-                    setThresholdValue(e.target.value.slice(1));
-                    setThresholdValueError("");
-                  }}
-                />
-                {thresholdValueError ? (
-                  <Form.Label className="error-message">
-                    {thresholdValueError}
-                  </Form.Label>
-                ) : null}
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group
-                as={Col}
-                className="form-group"
-                style={{ marginBottom: "0rem" }}
-              >
-                <Form.Label style={{ marginBottom: "0rem" }}>
-                  Check Rates Every:
-                </Form.Label>
-              </Form.Group>
-            </Row>
-            <Row>
-              <Form.Group as={Col} className="form-group">
-                <Form.Label>{`Day(s):`}</Form.Label>
-                <Form.Select
-                  name="days"
-                  onChange={(e) => {
-                    setDays(e.target.value);
-                    setTimeError("");
-                  }}
-                  value={days.length ? days : "days"}
+                Get Exchange Rate
+              </Button>
+            </div>
+            <Form
+              style={{
+                width:
+                  screenWidth <= 576
+                    ? "95%"
+                    : screenWidth <= 1000
+                    ? "75%"
+                    : screenWidth <= 729
+                    ? "85%"
+                    : "50%",
+              }}
+            >
+              <Row>
+                <Form.Group
+                  className="make-recurring-row"
+                  controlId="formTimeFrame"
+                  style={{ display: "flex" }}
                 >
-                  {daysRange.map((day) => {
-                    return (
-                      <option key={`day+${day}`} value={day}>
-                        {day}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-              </Form.Group>
-              <Form.Group as={Col} className="form-group">
-                <Form.Label>{`Hour(s):`}</Form.Label>
-                <Form.Select
-                  name="hours"
-                  onChange={(e) => {
-                    setHours(e.target.value);
-                    setTimeError("");
-                  }}
-                  value={hours.length ? hours : "hours"}
-                >
-                  {hoursRange.map((hour) => {
-                    return (
-                      <option key={`hour+${hour}`} value={hour}>
-                        {hour}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-                {timeError ? (
-                  <Form.Label className="error-message">{timeError}</Form.Label>
-                ) : null}
-              </Form.Group>
-              <Form.Group as={Col} className="form-group">
-                <Form.Label>{`Minute(s):`}</Form.Label>
-                <Form.Select
-                  name="minutes"
-                  onChange={(e) => {
-                    setMinutes(e.target.value);
-                    setTimeError("");
-                  }}
-                  value={minutes.length ? minutes : "minutes"}
-                >
-                  {minutesRange.map((minute) => {
-                    return (
-                      <option key={`minute+${minute}`} value={minute}>
-                        {minute}
-                      </option>
-                    );
-                  })}
-                </Form.Select>
-              </Form.Group>
-            </Row>
-            <Row style={{ marginTop: "1rem" }}>
-              <Form.Group
-                className="make-recurring-row"
-                controlId="formTimeFrame"
-                style={{ display: "flex" }}
-              >
-                <Form.Check // prettier-ignore
-                  type="checkbox"
-                  id={`Also Send Exchange Rate Trend Notifications`}
-                  label={`Also Send Exchange Rate Trend Notifications`}
+                  <Form.Check // prettier-ignore
+                    type="checkbox"
+                    id={`Set Recurring Email Notifications`}
+                    label={`Set Recurring Email Notifications`}
+                    onChange={(e) => {
+                      setMakeRecurring(e.target.checked);
+                      setTimeError("");
+                      setThresholdValueError("");
+                      setEmailError("");
+                      setEmail("");
+                      setThresholdValue("");
+                      setDays("0");
+                      setHours("0");
+                      setMinutes("0");
+                    }}
+                  />
+                </Form.Group>
+              </Row>
+
+              {makeRecurring ? (
+                <Row>
+                  <Row>
+                    <Form.Group
+                      as={Col}
+                      className="form-group"
+                      controlId="formBasicEmail"
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
+                      <Form.Label>Email address:</Form.Label>
+                      <Form.Control
+                        type="email"
+                        placeholder="JohnDoe@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setEmailError("");
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleExecute(email, Number(thresholdValue));
+                          }
+                        }}
+                      />
+                      {emailError ? (
+                        <Form.Label className="error-message">
+                          {emailError}
+                        </Form.Label>
+                      ) : null}
+                    </Form.Group>
+                    <Form.Group
+                      as={Col}
+                      className="form-group"
+                      controlId="formBasicEmail"
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
+                      <Form.Label>Threshold Value:</Form.Label>
+                      <Form.Control
+                        type="input"
+                        placeholder={`${toSymbol}1.21`}
+                        value={
+                          thresholdValue
+                            ? `${toSymbol}${thresholdValue}`
+                            : `${toSymbol}`
+                        }
+                        onChange={(e) => {
+                          setThresholdValue(e.target.value.slice(1));
+                          setThresholdValueError("");
+                        }}
+                      />
+                      {thresholdValueError ? (
+                        <Form.Label className="error-message">
+                          {thresholdValueError}
+                        </Form.Label>
+                      ) : null}
+                    </Form.Group>
+                  </Row>
+                  <Row>
+                    <Form.Group
+                      as={Col}
+                      className="form-group"
+                      style={{ marginBottom: "0rem" }}
+                    >
+                      <Form.Label style={{ marginBottom: "0rem" }}>
+                        Check Rates Every:
+                      </Form.Label>
+                    </Form.Group>
+                  </Row>
+                  <Row>
+                    <Form.Group as={Col} className="form-group">
+                      <Form.Label>{`Day(s):`}</Form.Label>
+                      <Form.Select
+                        name="days"
+                        onChange={(e) => {
+                          setDays(e.target.value);
+                          setTimeError("");
+                        }}
+                        value={days.length ? days : "days"}
+                      >
+                        {daysRange.map((day) => {
+                          return (
+                            <option key={`day+${day}`} value={day}>
+                              {day}
+                            </option>
+                          );
+                        })}
+                      </Form.Select>
+                    </Form.Group>
+                    <Form.Group as={Col} className="form-group">
+                      <Form.Label>{`Hour(s):`}</Form.Label>
+                      <Form.Select
+                        name="hours"
+                        onChange={(e) => {
+                          setHours(e.target.value);
+                          setTimeError("");
+                        }}
+                        value={hours.length ? hours : "hours"}
+                      >
+                        {hoursRange.map((hour) => {
+                          return (
+                            <option key={`hour+${hour}`} value={hour}>
+                              {hour}
+                            </option>
+                          );
+                        })}
+                      </Form.Select>
+                      {timeError ? (
+                        <Form.Label className="error-message">
+                          {timeError}
+                        </Form.Label>
+                      ) : null}
+                    </Form.Group>
+                    <Form.Group as={Col} className="form-group">
+                      <Form.Label>{`Minute(s):`}</Form.Label>
+                      <Form.Select
+                        name="minutes"
+                        onChange={(e) => {
+                          setMinutes(e.target.value);
+                          setTimeError("");
+                        }}
+                        value={minutes.length ? minutes : "minutes"}
+                      >
+                        {minutesRange.map((minute) => {
+                          return (
+                            <option key={`minute+${minute}`} value={minute}>
+                              {minute}
+                            </option>
+                          );
+                        })}
+                      </Form.Select>
+                    </Form.Group>
+                  </Row>
+                  <Row style={{ marginTop: "1rem" }}>
+                    <Form.Group
+                      className="make-recurring-row"
+                      controlId="formTimeFrame"
+                      style={{ display: "flex" }}
+                    >
+                      <Form.Check // prettier-ignore
+                        type="checkbox"
+                        id={`Also Send Exchange Rate Trend Notifications`}
+                        label={`Also Send Exchange Rate Trend Notifications`}
+                        style={{
+                          fontSize: screenWidth <= 405 ? "0.9rem" : null,
+                        }}
+                        onChange={(e) => {
+                          setEmailTrend(e.target.checked);
+                        }}
+                      />
+                    </Form.Group>
+                  </Row>
+                </Row>
+              ) : null}
+            </Form>
+            {makeRecurring ? (
+              <div className="button-div">
+                <Button
+                  variant="success"
+                  className="rate-buttons"
                   style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
-                  onChange={(e) => {
-                    setEmailTrend(e.target.checked);
+                  onClick={() => {
+                    handleRecurringEmailRequest();
                   }}
-                />
-              </Form.Group>
-            </Row>
-          </Row>
-        ) : null}
-      </Form>
-      {makeRecurring ? (
-        <div className="button-div">
-          <Button
-            variant="success"
-            className="rate-buttons"
-            style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
-            onClick={() => {
-              handleRecurringEmailRequest();
-            }}
-          >
-            Set Recurring Emails
-          </Button>
+                >
+                  Set Recurring Emails
+                </Button>
 
-          <Button
-            variant="danger"
-            className="rate-buttons"
-            onClick={() => {
-              handleDeleteRecurringEmailRequests();
-            }}
-            style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
+                <Button
+                  variant="danger"
+                  className="rate-buttons"
+                  onClick={() => {
+                    handleDeleteRecurringEmailRequests();
+                  }}
+                  style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
+                >
+                  Remove Recurring Emails
+                </Button>
+              </div>
+            ) : null}
+          </>
+        )}
+        <ToastContainer position="bottom-end" className="p-3">
+          <Toast
+            onClose={() => setShowToast(false)}
+            show={showToast}
+            delay={10000}
+            autohide
           >
-            Remove Recurring Emails
-          </Button>
-        </div>
-      ) : null}
-      <ToastContainer position="middle-center" className="p-3">
-        <Toast
-          onClose={() => setShowToast(false)}
-          show={showToast}
-          delay={5000}
-          autohide
-        >
-          <Toast.Header>
-            {toastIcon}
-            <strong className="me-auto">{requestStatus}</strong>
-          </Toast.Header>
-          <Toast.Body style={{ textAlign: "center" }}>
-            {toastMessage}
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
+            <Toast.Header>
+              {toastIcon}
+              <strong className="me-auto">{requestStatus}</strong>
+            </Toast.Header>
+            <Toast.Body style={{ textAlign: "center" }}>
+              {toastMessage}
+            </Toast.Body>
+          </Toast>
+        </ToastContainer>
+      </>
     </div>
   );
 }

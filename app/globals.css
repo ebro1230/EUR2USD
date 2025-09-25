@@ -7,8 +7,12 @@
   padding-top: 10rem;
   padding-bottom: 20rem;
 }
+.exchange-rate-title{
+  color:black;
+}
 .exchange-rate{
   color:black;
+  margin: 2rem 0rem;
 }
 .button-div{
   display: flex;
@@ -45,4 +49,8 @@
 
 .form-group{
   margin: 0.5rem;
+}
+.title{
+  margin-bottom: 5rem;
+  text-decoration: underline;
 }

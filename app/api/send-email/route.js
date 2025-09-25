@@ -23,8 +23,14 @@ export async function POST(req) {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: message,
-      text: `1 ${from.slice(0, 3)} = ${exchangeRate} ${to.slice(0, 3)}`,
+      subject: `${from.slice(0, 3)} to ${to.slice(
+        0,
+        3
+      )} Exchange Rate Notification`,
+      text: `${message}\n1 ${from.slice(0, 3)} = ${exchangeRate} ${to.slice(
+        0,
+        3
+      )}`,
     });
 
     return NextResponse.json({ success: true }, { status: 200 });
