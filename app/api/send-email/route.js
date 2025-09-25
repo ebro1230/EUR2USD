@@ -7,6 +7,8 @@ export async function POST(req) {
     const email = await body.email;
     const message = await body.trend;
     const exchangeRate = await body.exchangeRate;
+    const to = await body.to;
+    const from = await body.from;
 
     // Create transporter
     const transporter = nodemailer.createTransport({
@@ -22,7 +24,7 @@ export async function POST(req) {
       from: process.env.EMAIL_USER,
       to: email,
       subject: message,
-      text: `1€ = $${exchangeRate}`,
+      text: `1 ${from.slice(0, 3)} = ${exchangeRate} ${to.slice(0, 3)}`,
     });
 
     return NextResponse.json({ success: true }, { status: 200 });

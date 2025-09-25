@@ -146,6 +146,8 @@ export async function GET() {
                       email: user.email,
                       trend: "Exchange Rate Above Minimum Threshold",
                       exchangeRate: exchangeRate,
+                      to: user.to,
+                      from: user.from,
                     }),
                   }
                 );
@@ -174,6 +176,8 @@ export async function GET() {
                     email: user.email,
                     trend: `Exchange Rate Above Minimum Threshold & ${trend.message}`,
                     exchangeRate: exchangeRate,
+                    to: user.to,
+                    from: user.from,
                   }),
                 }
               );
@@ -201,6 +205,8 @@ export async function GET() {
                     email: user.email,
                     trend: trend.message,
                     exchangeRate: exchangeRate,
+                    to: user.to,
+                    from: user.from,
                   }),
                 }
               );
@@ -273,6 +279,8 @@ export async function GET() {
                       email: user.email,
                       trend: "Exchange Rate Above Minimum Threshold",
                       exchangeRate: exchangeRate,
+                      to: user.to,
+                      from: user.from,
                     }),
                   }
                 );
@@ -301,6 +309,8 @@ export async function GET() {
                     email: user.email,
                     trend: `Exchange Rate Above Minimum Threshold & ${trend.message}`,
                     exchangeRate: exchangeRate,
+                    to: user.to,
+                    from: user.from,
                   }),
                 }
               );
@@ -328,6 +338,8 @@ export async function GET() {
                     email: user.email,
                     trend: trend.message,
                     exchangeRate: exchangeRate,
+                    to: user.to,
+                    from: user.from,
                   }),
                 }
               );
