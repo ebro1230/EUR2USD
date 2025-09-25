@@ -23,10 +23,13 @@ export default function Home() {
   const [toastIcon, setToastIcon] = useState("");
   const [emailTrend, setEmailTrend] = useState(false);
   const [screenWidth, setScreenWidth] = useState(0);
+  const [from, setFrom] = useState("EUR (Euro)");
+  const [to, setTo] = useState("USD (United States Dollar)");
+  const [fromSymbol, setFromSymbol] = useState("€");
+  const [toSymbol, setToSymbol] = useState("$");
 
   const emailCheck = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const thresholdCheck =
-    /^(?:0\.(?!0{5})\d{1,5}|[1-4](?:\.\d{1,5})?|5(?:\.0{1,5})?)$/;
+  const thresholdCheck = /^(?:\d+)(?:\.\d{1,5})?$/;
 
   const daysRange = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -38,6 +41,34 @@ export default function Home() {
   ];
   const minutesRange = [0, 15, 30, 45];
   console.log("small change");
+
+  const currencyChoices = [
+    "USD (United States Dollar)",
+    "EUR (Euro)",
+    "AUD (Australian Dollar)",
+    "BRL (Brazilian Real)",
+    "GBP (British Pounds)",
+    "BGN (Bulgarian Levs)",
+    "CAD Canadian Dollars",
+    "CNY (Chinese Yuan)",
+    "CZK (Czech Korunas)",
+    "DKK (Danish Kroner)",
+    "HKD (Hong Kong Dollars)",
+    "HUF (Hungarian Forints)",
+    "INR (Indian Rupees)",
+    "IDR (Indonesian Rupiahs)",
+    "ILS (Israeli New Sheqels)",
+    "JPY (Japanese Yen)",
+    "MYR (Malaysian Ringgits)",
+    "NZD (New Zealand Dollars)",
+    "NOK (Norwegian Kroner)",
+    "PLN (Polish Zloty)",
+    "RON (Romanian Leus)",
+    "SGD (Singapore Dollars)",
+    "SEK (Swedish Kronor)",
+    "CHF (Swiss Francs)",
+    "TRY (Turkish Liras)",
+  ];
 
   const handleRecurringEmailRequest = () => {
     if (minutes == "0" && hours == "0" && days == "0") {
@@ -79,6 +110,8 @@ export default function Home() {
           minutes: Number(minutes),
           thresholdValue: Number(thresholdValue),
           trendNotifications: emailTrend,
+          from: from,
+          to: to,
         }),
       })
         .then((response) => response.json())
@@ -148,12 +181,19 @@ export default function Home() {
 
   const handleGetRateOnce = () => {
     setIsLoading(true);
-    fetch(`/api/scraper-cheerio`, {
-      method: "GET",
-    })
+    fetch(
+      `/api/scraper-cheerio?from=${encodeURIComponent(
+        from.slice(0, 3).toLowerCase()
+      )}&to=${encodeURIComponent(to.slice(0, 3).toLowerCase())}`,
+      {
+        method: "GET",
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
-        setExchangeRate(Number(data.replace(/,/g, "")) / 1000);
+        setExchangeRate(
+          Number(Number(Number(data.replace(/,/g, "")) / 1000).toFixed(5))
+        );
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -173,10 +213,116 @@ export default function Home() {
       });
   };
 
-  useEffect(() => {
-    if (!exchangeRate) {
-      handleGetRateOnce();
+  const handleChangeCurrencySymbol = (type, currency) => {
+    if (type === "from") {
+      if (currency === "USD") {
+        setFromSymbol("$");
+      } else if (currency === "EUR") {
+        setFromSymbol("€");
+      } else if (currency === "AUD") {
+        setFromSymbol("$");
+      } else if (currency === "BGN") {
+        setFromSymbol("лв");
+      } else if (currency === "BRL") {
+        setFromSymbol("R$");
+      } else if (currency === "CAD") {
+        setFromSymbol("$");
+      } else if (currency === "CHF") {
+        setFromSymbol("CHF");
+      } else if (currency === "CNY") {
+        setFromSymbol("¥");
+      } else if (currency === "CZK") {
+        setFromSymbol("Kč");
+      } else if (currency === "DKK") {
+        setFromSymbol("kr");
+      } else if (currency === "GBP") {
+        setFromSymbol("£");
+      } else if (currency === "HKD") {
+        setFromSymbol("$");
+      } else if (currency === "HUF") {
+        setFromSymbol("Ft");
+      } else if (currency === "IDR") {
+        setFromSymbol("Rp");
+      } else if (currency === "ILS") {
+        setFromSymbol("₪");
+      } else if (currency === "INR") {
+        setFromSymbol("₹");
+      } else if (currency === "JPY") {
+        setFromSymbol("¥");
+      } else if (currency === "MYR") {
+        setFromSymbol("RM");
+      } else if (currency === "NOK") {
+        setFromSymbol("kr");
+      } else if (currency === "NZD") {
+        setFromSymbol("$");
+      } else if (currency === "PLN") {
+        setFromSymbol("zł");
+      } else if (currency === "RON") {
+        setFromSymbol("lei");
+      } else if (currency === "SEK") {
+        setFromSymbol("kr");
+      } else if (currency === "SGD") {
+        setFromSymbol("$");
+      } else if (currency === "TRY") {
+        setFromSymbol("₺");
+      }
+    } else {
+      if (currency === "USD") {
+        setToSymbol("$");
+      } else if (currency === "EUR") {
+        setToSymbol("€");
+      } else if (currency === "AUD") {
+        setToSymbol("$");
+      } else if (currency === "BGN") {
+        setToSymbol("лв");
+      } else if (currency === "BRL") {
+        setToSymbol("R$");
+      } else if (currency === "CAD") {
+        setToSymbol("$");
+      } else if (currency === "CHF") {
+        setToSymbol("CHF");
+      } else if (currency === "CNY") {
+        setToSymbol("¥");
+      } else if (currency === "CZK") {
+        setToSymbol("Kč");
+      } else if (currency === "DKK") {
+        setToSymbol("kr");
+      } else if (currency === "GBP") {
+        setToSymbol("£");
+      } else if (currency === "HKD") {
+        setToSymbol("$");
+      } else if (currency === "HUF") {
+        setToSymbol("Ft");
+      } else if (currency === "IDR") {
+        setToSymbol("Rp");
+      } else if (currency === "ILS") {
+        setToSymbol("₪");
+      } else if (currency === "INR") {
+        setToSymbol("₹");
+      } else if (currency === "JPY") {
+        setToSymbol("¥");
+      } else if (currency === "MYR") {
+        setToSymbol("RM");
+      } else if (currency === "NOK") {
+        setToSymbol("kr");
+      } else if (currency === "NZD") {
+        setToSymbol("$");
+      } else if (currency === "PLN") {
+        setToSymbol("zł");
+      } else if (currency === "RON") {
+        setToSymbol("lei");
+      } else if (currency === "SEK") {
+        setToSymbol("kr");
+      } else if (currency === "SGD") {
+        setToSymbol("$");
+      } else if (currency === "TRY") {
+        setToSymbol("₺");
+      }
     }
+  };
+
+  useEffect(() => {
+    handleGetRateOnce();
 
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
@@ -186,18 +332,83 @@ export default function Home() {
     handleResize();
 
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [from, to]);
 
+  console.log("TO: ", to);
+  console.log("FROM: ", from);
   return (
     <div className="main-div">
+      <Form
+        style={{
+          width:
+            screenWidth <= 576
+              ? "95%"
+              : screenWidth <= 1000
+              ? "75%"
+              : screenWidth <= 729
+              ? "85%"
+              : "50%",
+        }}
+      >
+        <Row>
+          <Form.Group as={Col} className="form-group">
+            <Form.Label>{`Convert From:`}</Form.Label>
+            <Form.Select
+              name="from"
+              onChange={(e) => {
+                setFrom(e.target.value);
+
+                handleChangeCurrencySymbol("from", e.target.value.slice(0, 3));
+              }}
+              value={from}
+            >
+              {currencyChoices.map((currency) => {
+                return (
+                  <option
+                    key={`from+${currency}`}
+                    value={currency}
+                    disabled={currency === to}
+                  >
+                    {currency}
+                  </option>
+                );
+              })}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group as={Col} className="form-group">
+            <Form.Label>{`Convert To:`}</Form.Label>
+            <Form.Select
+              name="to"
+              onChange={(e) => {
+                setTo(e.target.value);
+                handleChangeCurrencySymbol("to", e.target.value.slice(0, 3));
+              }}
+              value={to}
+            >
+              {currencyChoices.map((currency) => {
+                return (
+                  <option
+                    key={`to+${currency}`}
+                    value={currency}
+                    disabled={currency === from}
+                  >
+                    {currency}
+                  </option>
+                );
+              })}
+            </Form.Select>
+          </Form.Group>
+        </Row>
+      </Form>
       {isLoading ? (
         <LoadingIndicator />
       ) : typeof exchangeRate === "number" ? (
         <div className="exchange-rate-display-div">
-          <h2 className="exchange-rate">EUR to USD Exchange Rate: </h2>
-          <h4 className="exchange-rate">{`1€ = $${exchangeRate.toFixed(
-            5
-          )}`}</h4>
+          <h2 className="exchange-rate">{`${from.slice(0, 3)} to ${to.slice(
+            0,
+            3
+          )} Exchange Rate: `}</h2>
+          <h4 className="exchange-rate">{`1${fromSymbol} = ${toSymbol}${exchangeRate}`}</h4>
         </div>
       ) : null}
       <div className="button-div">
@@ -287,8 +498,12 @@ export default function Home() {
                 <Form.Label>Threshold Value:</Form.Label>
                 <Form.Control
                   type="input"
-                  placeholder="$1.21"
-                  value={thresholdValue ? `$${thresholdValue}` : "$"}
+                  placeholder={`${toSymbol}1.21`}
+                  value={
+                    thresholdValue
+                      ? `${toSymbol}${thresholdValue}`
+                      : `${toSymbol}`
+                  }
                   onChange={(e) => {
                     setThresholdValue(e.target.value.slice(1));
                     setThresholdValueError("");
