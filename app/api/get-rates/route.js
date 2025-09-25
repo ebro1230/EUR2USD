@@ -94,6 +94,8 @@ export async function GET() {
         from: user.from,
         to: user.to,
       });
+      console.log("EXISTING RATE DATA");
+      console.log(existingRateData);
       if (existingRateData) {
         let exchangeRateTrendData = existingRateData.storedExchangeRates;
         try {
@@ -229,6 +231,8 @@ export async function GET() {
           to: user.to,
         });
         let exchangeRateTrendData = newRateData.storedExchangeRates;
+        console.log("NEW RATE DATA");
+        console.log(existingRateData);
         try {
           // Fetch exchange rate
           const scraperResponse = await fetch(
