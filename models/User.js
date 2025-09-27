@@ -12,6 +12,7 @@ const UserSchema = new mongoose.Schema(
     trendNotifications: { type: Boolean },
     from: { type: String },
     to: { type: String },
+    conversionAmount: { type: Number },
   },
   { timestamps: true }
 );

@@ -9,6 +9,7 @@ export async function POST(req) {
     const exchangeRate = await body.exchangeRate;
     const to = await body.to;
     const from = await body.from;
+    const conversionAmount = await body.conversionAmount;
 
     // Create transporter
     const transporter = nodemailer.createTransport({
@@ -27,10 +28,9 @@ export async function POST(req) {
         0,
         3
       )} Exchange Rate Notification`,
-      text: `${message}\n1 ${from.slice(0, 3)} = ${exchangeRate} ${to.slice(
-        0,
-        3
-      )}`,
+      text: `${message}\n${conversionAmount} ${from.slice(0, 3)} = ${
+        exchangeRate * conversionAmount
+      } ${to.slice(0, 3)}`,
     });
 
     return NextResponse.json({ success: true }, { status: 200 });

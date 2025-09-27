@@ -132,13 +132,19 @@ export async function GET() {
           const intervalDifference = currentTime - user.lastCheck;
 
           if (
-            (exchangeRate >= user.thresholdValue &&
+            (exchangeRate * user.conversionAmount >= user.thresholdValue &&
               trend.trend === "neutral") ||
-            (exchangeRate >= user.thresholdValue && !user.trendNotifications)
+            (exchangeRate * user.conversionAmount >= user.thresholdValue &&
+              !user.trendNotifications)
           ) {
             if (intervalDifference >= user.interval - 1000 * 60 * 3) {
               await User.findOneAndUpdate(
-                { email: user.email, to: user.to, from: user.from },
+                {
+                  email: user.email,
+                  to: user.to,
+                  from: user.from,
+                  conversionAmount: user.conversionAmount,
+                },
                 { $set: { lastCheck: currentTime } }
               );
               try {
@@ -154,6 +160,7 @@ export async function GET() {
                       exchangeRate: exchangeRate,
                       to: user.to,
                       from: user.from,
+                      conversionAmount: user.conversionAmount,
                     }),
                   }
                 );
@@ -167,7 +174,7 @@ export async function GET() {
               }
             }
           } else if (
-            exchangeRate >= user.thresholdValue &&
+            exchangeRate * user.conversionAmount >= user.thresholdValue &&
             trend.trend !== "neutral" &&
             user.trendNotifications
           ) {
@@ -184,6 +191,7 @@ export async function GET() {
                     exchangeRate: exchangeRate,
                     to: user.to,
                     from: user.from,
+                    conversionAmount: user.conversionAmount,
                   }),
                 }
               );
@@ -196,7 +204,7 @@ export async function GET() {
               console.error("Error sending email:", emailError);
             }
           } else if (
-            exchangeRate < user.thresholdValue &&
+            exchangeRate * user.conversionAmount < user.thresholdValue &&
             trend.trend !== "neutral" &&
             user.trendNotifications
           ) {
@@ -213,6 +221,7 @@ export async function GET() {
                     exchangeRate: exchangeRate,
                     to: user.to,
                     from: user.from,
+                    conversionAmount: user.conversionAmount,
                   }),
                 }
               );
@@ -265,13 +274,19 @@ export async function GET() {
           const intervalDifference = currentTime - user.lastCheck;
 
           if (
-            (exchangeRate >= user.thresholdValue &&
+            (exchangeRate * user.conversionAmount >= user.thresholdValue &&
               trend.trend === "neutral") ||
-            (exchangeRate >= user.thresholdValue && !user.trendNotifications)
+            (exchangeRate * user.conversionAmount >= user.thresholdValue &&
+              !user.trendNotifications)
           ) {
             if (intervalDifference >= user.interval - 1000 * 60 * 3) {
               await User.findOneAndUpdate(
-                { email: user.email, to: user.to, from: user.from },
+                {
+                  email: user.email,
+                  to: user.to,
+                  from: user.from,
+                  conversionAmount: user.conversionAmount,
+                },
                 { $set: { lastCheck: currentTime } }
               );
               try {
@@ -287,6 +302,7 @@ export async function GET() {
                       exchangeRate: exchangeRate,
                       to: user.to,
                       from: user.from,
+                      conversionAmount: user.conversionAmount,
                     }),
                   }
                 );
@@ -300,7 +316,7 @@ export async function GET() {
               }
             }
           } else if (
-            exchangeRate >= user.thresholdValue &&
+            exchangeRate * user.conversionAmount >= user.thresholdValue &&
             trend.trend !== "neutral" &&
             user.trendNotifications
           ) {
@@ -317,6 +333,7 @@ export async function GET() {
                     exchangeRate: exchangeRate,
                     to: user.to,
                     from: user.from,
+                    conversionAmount: user.conversionAmount,
                   }),
                 }
               );
@@ -329,7 +346,7 @@ export async function GET() {
               console.error("Error sending email:", emailError);
             }
           } else if (
-            exchangeRate < user.thresholdValue &&
+            exchangeRate * user.conversionAmount < user.thresholdValue &&
             trend.trend !== "neutral" &&
             user.trendNotifications
           ) {
@@ -346,6 +363,7 @@ export async function GET() {
                     exchangeRate: exchangeRate,
                     to: user.to,
                     from: user.from,
+                    conversionAmount: user.conversionAmount,
                   }),
                 }
               );

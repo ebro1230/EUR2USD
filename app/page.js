@@ -28,6 +28,8 @@ export default function Home() {
   const [fromSymbol, setFromSymbol] = useState("€");
   const [toSymbol, setToSymbol] = useState("$");
   const [isEmailRequestActive, setIsEmailRequestActive] = useState(false);
+  const [conversionAmount, setConversionAmount] = useState(1);
+  const [conversionAmountError, setConversionAmountError] = useState("");
 
   const emailCheck = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const thresholdCheck = /^(?:\d+)(?:\.\d{1,5})?$/;
@@ -84,12 +86,19 @@ export default function Home() {
         "Please enter a Threshold Value for Receiving Emails Between $0.00001 & $5.00000"
       );
     }
+    if (!thresholdCheck.test(conversionAmount)) {
+      setConversionAmountError(
+        "Please enter a Conversion Amount for Receiving Emails Between $0.00001 & $5.00000"
+      );
+    }
     if (
       !timeError &&
       !emailError &&
       !thresholdValueError &&
+      !conversionAmountError &&
       emailCheck.test(email) &&
       thresholdCheck.test(thresholdValue) &&
+      thresholdCheck.test(conversionAmount) &&
       (minutes != "0" || hours != "0" || days != "0")
     ) {
       setIsEmailRequestActive(true);
@@ -113,6 +122,7 @@ export default function Home() {
           trendNotifications: emailTrend,
           from: from,
           to: to,
+          conversionAmount: conversionAmount,
         }),
       })
         .then((response) => response.json())
@@ -215,36 +225,42 @@ export default function Home() {
 
   const handleGetRateOnce = () => {
     setIsLoading(true);
-    fetch(
-      `/api/scraper-cheerio?from=${encodeURIComponent(
-        from.slice(0, 3).toLowerCase()
-      )}&to=${encodeURIComponent(to.slice(0, 3).toLowerCase())}`,
-      {
-        method: "GET",
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setExchangeRate(
-          Number(Number(Number(data.replace(/,/g, "")) / 1000).toFixed(5))
-        );
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setToastMessage("Failed to Get Exchange Rates");
-        setRequestStatus("Request Error");
-        setToastIcon(
-          <i
-            className="bi bi-x-square-fill"
-            style={{ color: "red", marginRight: "1rem" }}
-          ></i>
-        );
+    if (!thresholdCheck.test(conversionAmount)) {
+      setConversionAmountError(
+        "Please enter a Conversion Amount for Receiving Emails Between $0.00001 & $5.00000"
+      );
+    } else {
+      fetch(
+        `/api/scraper-cheerio?from=${encodeURIComponent(
+          from.slice(0, 3).toLowerCase()
+        )}&to=${encodeURIComponent(to.slice(0, 3).toLowerCase())}`,
+        {
+          method: "GET",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          setExchangeRate(
+            Number(Number(Number(data.replace(/,/g, "")) / 1000).toFixed(5))
+          );
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setToastMessage("Failed to Get Exchange Rates");
+          setRequestStatus("Request Error");
+          setToastIcon(
+            <i
+              className="bi bi-x-square-fill"
+              style={{ color: "red", marginRight: "1rem" }}
+            ></i>
+          );
 
-        setShowToast(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+          setShowToast(true);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   };
 
   const handleChangeCurrencySymbol = (type, currency) => {
@@ -354,7 +370,8 @@ export default function Home() {
       }
     }
   };
-
+  console.log("From Symbol: ", fromSymbol);
+  console.log("Conversion Amount: ", conversionAmount);
   useEffect(() => {
     handleGetRateOnce();
 
@@ -452,6 +469,62 @@ export default function Home() {
                   </Form.Select>
                 </Form.Group>
               </Row>
+              <Row>
+                <Form.Group>
+                  <Form.Group
+                    as={Col}
+                    className="form-group"
+                    controlId="formConversionAmount"
+                    style={{ display: "flex", flexDirection: "column" }}
+                  >
+                    <Form.Label>Conversion Amount:</Form.Label>
+                    <Form.Control
+                      type="input"
+                      placeholder={`${fromSymbol}1.00`}
+                      value={
+                        conversionAmount
+                          ? `${fromSymbol}${conversionAmount}`
+                          : `${fromSymbol}`
+                      }
+                      onChange={(e) => {
+                        if (fromSymbol === "lei" || fromSymbol === "CHF") {
+                          setConversionAmount(e.target.value.slice(3));
+                          setConversionAmountError("");
+                        } else if (
+                          fromSymbol === "лв" ||
+                          fromSymbol === "R$" ||
+                          fromSymbol === "Kč" ||
+                          fromSymbol === "kr" ||
+                          fromSymbol === "Ft" ||
+                          fromSymbol === "Rp" ||
+                          fromSymbol === "RM" ||
+                          fromSymbol === "zł"
+                        ) {
+                          setConversionAmount(e.target.value.slice(2));
+                          console.log(
+                            "Conversion Amount in else if statement: ",
+                            e.target.value
+                          );
+                          console.log(
+                            "Sliced Amount: ",
+                            e.target.value.slice(2)
+                          );
+                          console.log("Two Symbols");
+                          setConversionAmountError("");
+                        } else {
+                          setConversionAmount(e.target.value.slice(1));
+                          setConversionAmountError("");
+                        }
+                      }}
+                    />
+                    {conversionAmountError ? (
+                      <Form.Label className="error-message">
+                        {conversionAmountError}
+                      </Form.Label>
+                    ) : null}
+                  </Form.Group>
+                </Form.Group>
+              </Row>
             </Form>
             {isLoading ? (
               <LoadingIndicator />
@@ -462,26 +535,79 @@ export default function Home() {
                   3
                 )} to ${to.slice(0, 3)} Exchange Rate: `}</h2>
                 <h4 className="exchange-rate">
-                  {(fromSymbol === "$" ||
-                    fromSymbol === "R$" ||
-                    fromSymbol === "£" ||
-                    fromSymbol === "¥" ||
-                    fromSymbol === "₹" ||
-                    fromSymbol === "Rp" ||
-                    fromSymbol === "₪" ||
-                    fromSymbol === "RM" ||
-                    fromSymbol === "CHF" ||
-                    fromSymbol === "₺") &&
-                  (toSymbol === "$" ||
-                    toSymbol === "R$" ||
-                    toSymbol === "£" ||
-                    toSymbol === "¥" ||
-                    toSymbol === "₹" ||
-                    toSymbol === "Rp" ||
-                    toSymbol === "₪" ||
-                    toSymbol === "RM" ||
-                    toSymbol === "CHF" ||
-                    toSymbol === "₺")
+                  {conversionAmount
+                    ? (fromSymbol === "$" ||
+                        fromSymbol === "R$" ||
+                        fromSymbol === "£" ||
+                        fromSymbol === "¥" ||
+                        fromSymbol === "₹" ||
+                        fromSymbol === "Rp" ||
+                        fromSymbol === "₪" ||
+                        fromSymbol === "RM" ||
+                        fromSymbol === "CHF" ||
+                        fromSymbol === "₺") &&
+                      (toSymbol === "$" ||
+                        toSymbol === "R$" ||
+                        toSymbol === "£" ||
+                        toSymbol === "¥" ||
+                        toSymbol === "₹" ||
+                        toSymbol === "Rp" ||
+                        toSymbol === "₪" ||
+                        toSymbol === "RM" ||
+                        toSymbol === "CHF" ||
+                        toSymbol === "₺")
+                      ? `${fromSymbol}${conversionAmount} = ${toSymbol}${(
+                          exchangeRate * conversionAmount
+                        ).toFixed(5)}`
+                      : toSymbol === "$" ||
+                        toSymbol === "R$" ||
+                        toSymbol === "£" ||
+                        toSymbol === "¥" ||
+                        toSymbol === "₹" ||
+                        toSymbol === "Rp" ||
+                        toSymbol === "₪" ||
+                        toSymbol === "RM" ||
+                        toSymbol === "CHF" ||
+                        toSymbol === "₺"
+                      ? `${conversionAmount}${fromSymbol} = ${toSymbol}${(
+                          exchangeRate * conversionAmount
+                        ).toFixed(5)}`
+                      : fromSymbol === "$" ||
+                        fromSymbol === "R$" ||
+                        fromSymbol === "£" ||
+                        fromSymbol === "¥" ||
+                        fromSymbol === "₹" ||
+                        fromSymbol === "Rp" ||
+                        fromSymbol === "₪" ||
+                        fromSymbol === "RM" ||
+                        fromSymbol === "CHF" ||
+                        fromSymbol === "₺"
+                      ? `${fromSymbol}${conversionAmount} = ${(
+                          exchangeRate * conversionAmount
+                        ).toFixed(5)}${toSymbol}`
+                      : `${conversionAmount}${fromSymbol} = ${(
+                          exchangeRate * conversionAmount
+                        ).toFixed(5)}${toSymbol}`
+                    : (fromSymbol === "$" ||
+                        fromSymbol === "R$" ||
+                        fromSymbol === "£" ||
+                        fromSymbol === "¥" ||
+                        fromSymbol === "₹" ||
+                        fromSymbol === "Rp" ||
+                        fromSymbol === "₪" ||
+                        fromSymbol === "RM" ||
+                        fromSymbol === "CHF" ||
+                        fromSymbol === "₺") &&
+                      (toSymbol === "$" ||
+                        toSymbol === "R$" ||
+                        toSymbol === "£" ||
+                        toSymbol === "¥" ||
+                        toSymbol === "₹" ||
+                        toSymbol === "Rp" ||
+                        toSymbol === "₪" ||
+                        toSymbol === "RM" ||
+                        toSymbol === "CHF" ||
+                        toSymbol === "₺")
                     ? `${fromSymbol}1 = ${toSymbol}${exchangeRate}`
                     : toSymbol === "$" ||
                       toSymbol === "R$" ||
@@ -590,7 +716,7 @@ export default function Home() {
                     <Form.Group
                       as={Col}
                       className="form-group"
-                      controlId="formBasicEmail"
+                      controlId="formThresholdValue"
                       style={{ display: "flex", flexDirection: "column" }}
                     >
                       <Form.Label>Threshold Value:</Form.Label>
