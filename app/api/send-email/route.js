@@ -28,9 +28,9 @@ export async function POST(req) {
         0,
         3
       )} Exchange Rate Notification`,
-      text: `${message}\n${conversionAmount} ${from.slice(0, 3)} = ${
+      text: `${message}\n${conversionAmount} ${from.slice(0, 3)} = ${(
         exchangeRate * conversionAmount
-      } ${to.slice(0, 3)}`,
+      ).toFixed(5)} ${to.slice(0, 3)}`,
     });
 
     return NextResponse.json({ success: true }, { status: 200 });

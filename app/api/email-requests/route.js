@@ -9,10 +9,13 @@ export async function POST(req) {
     body.lastCheck = new Date();
     const existingUser = await User.findOne({
       email: body.email,
-      thresholdValue: body.thresholdValue,
+      thresholdValue: Number(
+        (body.thresholdValue / body.conversionAmount).toFixed(5)
+      ),
       interval: body.interval,
       from: body.from,
       to: body.to,
+      conversionAmount: body.conversionAmount,
     });
     if (existingUser) {
       return NextResponse.json(
@@ -31,15 +34,18 @@ export async function POST(req) {
         hours: body.hours,
         minutes: body.minutes,
         lastCheck: new Date(),
-        thresholdValue: body.thresholdValue,
+        thresholdValue: Number(
+          (body.thresholdValue / body.conversionAmount).toFixed(5)
+        ),
         trendNotifications: body.trendNotifications,
         from: body.from,
         to: body.to,
+        conversionAmount: body.conversionAmount,
       });
       return NextResponse.json(
         {
           success: true,
-          message: `Recurring Email Request created for ${newUser.email} when the ${newUser.from} is valued greater than or equal to the ${newUser.thresholdValue}, checking the exchange rate every ${newUser.days} days, ${newUser.hours} hours, and ${newUser.minutes} minutes`,
+          message: `Recurring Email Request created for ${newUser.email} when ${newUser.conversionAmount} ${newUser.from} is valued greater than or equal to the ${newUser.thresholdValue}, checking the exchange rate every ${newUser.days} day(s), ${newUser.hours} hour(s), and ${newUser.minutes} minute(s)`,
         },
         { status: 200 }
       );
