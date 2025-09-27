@@ -45,7 +45,13 @@ export async function POST(req) {
       return NextResponse.json(
         {
           success: true,
-          message: `Recurring Email Request created for ${newUser.email} when ${newUser.conversionAmount} ${newUser.from} is valued greater than or equal to the ${newUser.thresholdValue}, checking the exchange rate every ${newUser.days} day(s), ${newUser.hours} hour(s), and ${newUser.minutes} minute(s)`,
+          message: `Recurring Email Request created for ${newUser.email} when ${
+            newUser.conversionAmount
+          } ${newUser.from} is valued greater than or equal to the ${(
+            newUser.thresholdValue * newUser.conversionAmount
+          ).toFixed(5)}, checking the exchange rate every ${
+            newUser.days
+          } day(s), ${newUser.hours} hour(s), and ${newUser.minutes} minute(s)`,
         },
         { status: 200 }
       );
