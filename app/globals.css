@@ -4,8 +4,18 @@
   justify-content: center;
   align-items: center;
   width:100%;
-  padding-top: 10rem;
+  padding-top: 20rem;
   padding-bottom: 20rem;
+  background: #008000b2;
+}
+.raised-div{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #e6e6e6;
+  border-radius: 25px;
+  box-shadow: 0 20px 25px rgba(0,0,0,0.1);
 }
 .exchange-rate-title{
   color:black;

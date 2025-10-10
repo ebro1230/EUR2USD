@@ -147,6 +147,15 @@ export default function Home() {
             );
           }
           setShowToast(true);
+          setMakeRecurring(false);
+          setTimeError("");
+          setThresholdValueError("");
+          setEmailError("");
+          setEmail("");
+          setThresholdValue("");
+          setDays("0");
+          setHours("0");
+          setMinutes("0");
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -160,6 +169,15 @@ export default function Home() {
           );
 
           setShowToast(true);
+          setMakeRecurring(false);
+          setTimeError("");
+          setThresholdValueError("");
+          setEmailError("");
+          setEmail("");
+          setThresholdValue("");
+          setDays("0");
+          setHours("0");
+          setMinutes("0");
         })
         .finally(() => {
           setIsEmailRequestActive(false);
@@ -203,6 +221,15 @@ export default function Home() {
             );
           }
           setShowToast(true);
+          setMakeRecurring(false);
+          setTimeError("");
+          setThresholdValueError("");
+          setEmailError("");
+          setEmail("");
+          setThresholdValue("");
+          setDays("0");
+          setHours("0");
+          setMinutes("0");
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -216,6 +243,15 @@ export default function Home() {
           );
 
           setShowToast(true);
+          setMakeRecurring(false);
+          setTimeError("");
+          setThresholdValueError("");
+          setEmailError("");
+          setEmail("");
+          setThresholdValue("");
+          setDays("0");
+          setHours("0");
+          setMinutes("0");
         })
         .finally(() => {
           setIsEmailRequestActive(false);
@@ -388,177 +424,242 @@ export default function Home() {
   return (
     <div className="main-div">
       <>
-        <h1 className="title">Exchange Rate Calculator</h1>
-        {isEmailRequestActive ? (
-          <LoadingIndicator />
-        ) : (
-          <>
-            <Form
-              style={{
-                width:
-                  screenWidth <= 576
-                    ? "95%"
-                    : screenWidth <= 1000
-                    ? "75%"
-                    : screenWidth <= 729
-                    ? "85%"
-                    : "50%",
-              }}
-            >
-              <Row>
-                <Form.Group as={Col} className="form-group">
-                  <Form.Label>{`Convert From:`}</Form.Label>
-                  <Form.Select
-                    name="from"
-                    onChange={(e) => {
-                      if (e.target.value === to) {
-                        setTo(from);
-                        handleChangeCurrencySymbol("to", from.slice(0, 3));
-                      }
-                      setFrom(e.target.value);
-
-                      handleChangeCurrencySymbol(
-                        "from",
-                        e.target.value.slice(0, 3)
-                      );
-                    }}
-                    value={from}
-                  >
-                    {currencyChoices.map((currency) => {
-                      return (
-                        <option
-                          key={`from+${currency}`}
-                          value={currency}
-                          //disabled={currency === to}
-                        >
-                          {currency}
-                        </option>
-                      );
-                    })}
-                  </Form.Select>
-                </Form.Group>
-                <Form.Group as={Col} className="form-group">
-                  <Form.Label>{`Convert To:`}</Form.Label>
-                  <Form.Select
-                    name="to"
-                    onChange={(e) => {
-                      if (e.target.value === from) {
-                        setFrom(to);
-                        handleChangeCurrencySymbol("from", to.slice(0, 3));
-                      }
-                      setTo(e.target.value);
-
-                      handleChangeCurrencySymbol(
-                        "to",
-                        e.target.value.slice(0, 3)
-                      );
-                    }}
-                    value={to}
-                  >
-                    {currencyChoices.map((currency) => {
-                      return (
-                        <option
-                          key={`to+${currency}`}
-                          value={currency}
-                          //disabled={currency === from}
-                        >
-                          {currency}
-                        </option>
-                      );
-                    })}
-                  </Form.Select>
-                </Form.Group>
-              </Row>
-              <Row>
-                <Form.Group>
-                  <Form.Group
-                    as={Col}
-                    className="form-group"
-                    controlId="formConversionAmount"
-                    style={{ display: "flex", flexDirection: "column" }}
-                  >
-                    <Form.Label>Conversion Amount:</Form.Label>
-                    <Form.Control
-                      type="input"
-                      placeholder={`${fromSymbol}1.00`}
-                      value={
-                        conversionAmount
-                          ? `${fromSymbol}${conversionAmount}`
-                          : `${fromSymbol}`
-                      }
+        <div
+          className="raised-div"
+          style={{
+            width:
+              screenWidth <= 449
+                ? "100%"
+                : screenWidth <= 609
+                ? "90%"
+                : screenWidth <= 701
+                ? "80%"
+                : screenWidth <= 809
+                ? "70%"
+                : "60%",
+          }}
+        >
+          <h1 className="title">Exchange Rate Calculator</h1>
+          {isEmailRequestActive ? (
+            <LoadingIndicator />
+          ) : (
+            <>
+              <Form
+                style={{
+                  width:
+                    screenWidth <= 576
+                      ? "95%"
+                      : screenWidth <= 1000
+                      ? "75%"
+                      : screenWidth <= 729
+                      ? "85%"
+                      : "50%",
+                }}
+              >
+                <Row>
+                  <Form.Group as={Col} className="form-group">
+                    <Form.Label>{`Convert From:`}</Form.Label>
+                    <Form.Select
+                      name="from"
                       onChange={(e) => {
-                        if (fromSymbol === "lei" || fromSymbol === "CHF") {
-                          setConversionAmount(e.target.value.slice(3));
-                          setConversionAmountError("");
-                        } else if (
-                          fromSymbol === "лв" ||
-                          fromSymbol === "R$" ||
-                          fromSymbol === "Kč" ||
-                          fromSymbol === "kr" ||
-                          fromSymbol === "Ft" ||
-                          fromSymbol === "Rp" ||
-                          fromSymbol === "RM" ||
-                          fromSymbol === "zł"
-                        ) {
-                          setConversionAmount(e.target.value.slice(2));
-                          console.log(
-                            "Conversion Amount in else if statement: ",
-                            e.target.value
-                          );
-                          console.log(
-                            "Sliced Amount: ",
-                            e.target.value.slice(2)
-                          );
-                          console.log("Two Symbols");
-                          setConversionAmountError("");
-                        } else {
-                          setConversionAmount(e.target.value.slice(1));
-                          setConversionAmountError("");
+                        if (e.target.value === to) {
+                          setTo(from);
+                          handleChangeCurrencySymbol("to", from.slice(0, 3));
                         }
+                        setFrom(e.target.value);
+
+                        handleChangeCurrencySymbol(
+                          "from",
+                          e.target.value.slice(0, 3)
+                        );
                       }}
-                    />
-                    {conversionAmountError ? (
-                      <Form.Label className="error-message">
-                        {conversionAmountError}
-                      </Form.Label>
-                    ) : null}
+                      value={from}
+                    >
+                      {currencyChoices.map((currency) => {
+                        return (
+                          <option
+                            key={`from+${currency}`}
+                            value={currency}
+                            //disabled={currency === to}
+                          >
+                            {currency}
+                          </option>
+                        );
+                      })}
+                    </Form.Select>
                   </Form.Group>
-                </Form.Group>
-              </Row>
-            </Form>
-            {isLoading ? (
-              <LoadingIndicator />
-            ) : typeof exchangeRate === "number" ? (
-              <div className="exchange-rate-display-div">
-                <h2 className="exchange-rate-title">{`${from.slice(
-                  0,
-                  3
-                )} to ${to.slice(0, 3)} Exchange Rate: `}</h2>
-                <h4 className="exchange-rate">
-                  {conversionAmount
-                    ? (fromSymbol === "$" ||
-                        fromSymbol === "R$" ||
-                        fromSymbol === "£" ||
-                        fromSymbol === "¥" ||
-                        fromSymbol === "₹" ||
-                        fromSymbol === "Rp" ||
-                        fromSymbol === "₪" ||
-                        fromSymbol === "RM" ||
-                        fromSymbol === "CHF" ||
-                        fromSymbol === "₺") &&
-                      (toSymbol === "$" ||
-                        toSymbol === "R$" ||
-                        toSymbol === "£" ||
-                        toSymbol === "¥" ||
-                        toSymbol === "₹" ||
-                        toSymbol === "Rp" ||
-                        toSymbol === "₪" ||
-                        toSymbol === "RM" ||
-                        toSymbol === "CHF" ||
-                        toSymbol === "₺")
-                      ? `${fromSymbol}${conversionAmount} = ${toSymbol}${(
-                          exchangeRate * conversionAmount
-                        ).toFixed(5)}`
+                  <Form.Group as={Col} className="form-group">
+                    <Form.Label>{`Convert To:`}</Form.Label>
+                    <Form.Select
+                      name="to"
+                      onChange={(e) => {
+                        if (e.target.value === from) {
+                          setFrom(to);
+                          handleChangeCurrencySymbol("from", to.slice(0, 3));
+                        }
+                        setTo(e.target.value);
+
+                        handleChangeCurrencySymbol(
+                          "to",
+                          e.target.value.slice(0, 3)
+                        );
+                      }}
+                      value={to}
+                    >
+                      {currencyChoices.map((currency) => {
+                        return (
+                          <option
+                            key={`to+${currency}`}
+                            value={currency}
+                            //disabled={currency === from}
+                          >
+                            {currency}
+                          </option>
+                        );
+                      })}
+                    </Form.Select>
+                  </Form.Group>
+                </Row>
+                <Row>
+                  <Form.Group>
+                    <Form.Group
+                      as={Col}
+                      className="form-group"
+                      controlId="formConversionAmount"
+                      style={{ display: "flex", flexDirection: "column" }}
+                    >
+                      <Form.Label>Conversion Amount:</Form.Label>
+                      <Form.Control
+                        type="input"
+                        placeholder={`${fromSymbol}1.00`}
+                        value={
+                          conversionAmount
+                            ? `${fromSymbol}${conversionAmount}`
+                            : `${fromSymbol}`
+                        }
+                        onChange={(e) => {
+                          if (fromSymbol === "lei" || fromSymbol === "CHF") {
+                            setConversionAmount(e.target.value.slice(3));
+                            setConversionAmountError("");
+                          } else if (
+                            fromSymbol === "лв" ||
+                            fromSymbol === "R$" ||
+                            fromSymbol === "Kč" ||
+                            fromSymbol === "kr" ||
+                            fromSymbol === "Ft" ||
+                            fromSymbol === "Rp" ||
+                            fromSymbol === "RM" ||
+                            fromSymbol === "zł"
+                          ) {
+                            setConversionAmount(e.target.value.slice(2));
+                            console.log(
+                              "Conversion Amount in else if statement: ",
+                              e.target.value
+                            );
+                            console.log(
+                              "Sliced Amount: ",
+                              e.target.value.slice(2)
+                            );
+                            console.log("Two Symbols");
+                            setConversionAmountError("");
+                          } else {
+                            setConversionAmount(e.target.value.slice(1));
+                            setConversionAmountError("");
+                          }
+                        }}
+                      />
+                      {conversionAmountError ? (
+                        <Form.Label className="error-message">
+                          {conversionAmountError}
+                        </Form.Label>
+                      ) : null}
+                    </Form.Group>
+                  </Form.Group>
+                </Row>
+              </Form>
+              {isLoading ? (
+                <LoadingIndicator />
+              ) : typeof exchangeRate === "number" ? (
+                <div className="exchange-rate-display-div">
+                  <h2 className="exchange-rate-title">{`${from.slice(
+                    0,
+                    3
+                  )} to ${to.slice(0, 3)} Exchange Rate: `}</h2>
+                  <h4 className="exchange-rate">
+                    {conversionAmount
+                      ? (fromSymbol === "$" ||
+                          fromSymbol === "R$" ||
+                          fromSymbol === "£" ||
+                          fromSymbol === "¥" ||
+                          fromSymbol === "₹" ||
+                          fromSymbol === "Rp" ||
+                          fromSymbol === "₪" ||
+                          fromSymbol === "RM" ||
+                          fromSymbol === "CHF" ||
+                          fromSymbol === "₺") &&
+                        (toSymbol === "$" ||
+                          toSymbol === "R$" ||
+                          toSymbol === "£" ||
+                          toSymbol === "¥" ||
+                          toSymbol === "₹" ||
+                          toSymbol === "Rp" ||
+                          toSymbol === "₪" ||
+                          toSymbol === "RM" ||
+                          toSymbol === "CHF" ||
+                          toSymbol === "₺")
+                        ? `${fromSymbol}${conversionAmount} = ${toSymbol}${(
+                            exchangeRate * conversionAmount
+                          ).toFixed(5)}`
+                        : toSymbol === "$" ||
+                          toSymbol === "R$" ||
+                          toSymbol === "£" ||
+                          toSymbol === "¥" ||
+                          toSymbol === "₹" ||
+                          toSymbol === "Rp" ||
+                          toSymbol === "₪" ||
+                          toSymbol === "RM" ||
+                          toSymbol === "CHF" ||
+                          toSymbol === "₺"
+                        ? `${conversionAmount}${fromSymbol} = ${toSymbol}${(
+                            exchangeRate * conversionAmount
+                          ).toFixed(5)}`
+                        : fromSymbol === "$" ||
+                          fromSymbol === "R$" ||
+                          fromSymbol === "£" ||
+                          fromSymbol === "¥" ||
+                          fromSymbol === "₹" ||
+                          fromSymbol === "Rp" ||
+                          fromSymbol === "₪" ||
+                          fromSymbol === "RM" ||
+                          fromSymbol === "CHF" ||
+                          fromSymbol === "₺"
+                        ? `${fromSymbol}${conversionAmount} = ${(
+                            exchangeRate * conversionAmount
+                          ).toFixed(5)}${toSymbol}`
+                        : `${conversionAmount}${fromSymbol} = ${(
+                            exchangeRate * conversionAmount
+                          ).toFixed(5)}${toSymbol}`
+                      : (fromSymbol === "$" ||
+                          fromSymbol === "R$" ||
+                          fromSymbol === "£" ||
+                          fromSymbol === "¥" ||
+                          fromSymbol === "₹" ||
+                          fromSymbol === "Rp" ||
+                          fromSymbol === "₪" ||
+                          fromSymbol === "RM" ||
+                          fromSymbol === "CHF" ||
+                          fromSymbol === "₺") &&
+                        (toSymbol === "$" ||
+                          toSymbol === "R$" ||
+                          toSymbol === "£" ||
+                          toSymbol === "¥" ||
+                          toSymbol === "₹" ||
+                          toSymbol === "Rp" ||
+                          toSymbol === "₪" ||
+                          toSymbol === "RM" ||
+                          toSymbol === "CHF" ||
+                          toSymbol === "₺")
+                      ? `${fromSymbol}1 = ${toSymbol}${exchangeRate}`
                       : toSymbol === "$" ||
                         toSymbol === "R$" ||
                         toSymbol === "£" ||
@@ -569,9 +670,7 @@ export default function Home() {
                         toSymbol === "RM" ||
                         toSymbol === "CHF" ||
                         toSymbol === "₺"
-                      ? `${conversionAmount}${fromSymbol} = ${toSymbol}${(
-                          exchangeRate * conversionAmount
-                        ).toFixed(5)}`
+                      ? `1${fromSymbol} = ${toSymbol}${exchangeRate}`
                       : fromSymbol === "$" ||
                         fromSymbol === "R$" ||
                         fromSymbol === "£" ||
@@ -582,304 +681,257 @@ export default function Home() {
                         fromSymbol === "RM" ||
                         fromSymbol === "CHF" ||
                         fromSymbol === "₺"
-                      ? `${fromSymbol}${conversionAmount} = ${(
-                          exchangeRate * conversionAmount
-                        ).toFixed(5)}${toSymbol}`
-                      : `${conversionAmount}${fromSymbol} = ${(
-                          exchangeRate * conversionAmount
-                        ).toFixed(5)}${toSymbol}`
-                    : (fromSymbol === "$" ||
-                        fromSymbol === "R$" ||
-                        fromSymbol === "£" ||
-                        fromSymbol === "¥" ||
-                        fromSymbol === "₹" ||
-                        fromSymbol === "Rp" ||
-                        fromSymbol === "₪" ||
-                        fromSymbol === "RM" ||
-                        fromSymbol === "CHF" ||
-                        fromSymbol === "₺") &&
-                      (toSymbol === "$" ||
-                        toSymbol === "R$" ||
-                        toSymbol === "£" ||
-                        toSymbol === "¥" ||
-                        toSymbol === "₹" ||
-                        toSymbol === "Rp" ||
-                        toSymbol === "₪" ||
-                        toSymbol === "RM" ||
-                        toSymbol === "CHF" ||
-                        toSymbol === "₺")
-                    ? `${fromSymbol}1 = ${toSymbol}${exchangeRate}`
-                    : toSymbol === "$" ||
-                      toSymbol === "R$" ||
-                      toSymbol === "£" ||
-                      toSymbol === "¥" ||
-                      toSymbol === "₹" ||
-                      toSymbol === "Rp" ||
-                      toSymbol === "₪" ||
-                      toSymbol === "RM" ||
-                      toSymbol === "CHF" ||
-                      toSymbol === "₺"
-                    ? `1${fromSymbol} = ${toSymbol}${exchangeRate}`
-                    : fromSymbol === "$" ||
-                      fromSymbol === "R$" ||
-                      fromSymbol === "£" ||
-                      fromSymbol === "¥" ||
-                      fromSymbol === "₹" ||
-                      fromSymbol === "Rp" ||
-                      fromSymbol === "₪" ||
-                      fromSymbol === "RM" ||
-                      fromSymbol === "CHF" ||
-                      fromSymbol === "₺"
-                    ? `${fromSymbol}1 = ${exchangeRate}${toSymbol}`
-                    : `1${fromSymbol} = ${exchangeRate}${toSymbol}`}
-                </h4>
-              </div>
-            ) : null}
-            <div className="button-div">
-              <Button
-                variant="primary"
-                className="rate-buttons"
-                onClick={() => {
-                  handleGetRateOnce();
-                }}
-              >
-                Get Exchange Rate
-              </Button>
-            </div>
-            <Form
-              style={{
-                width:
-                  screenWidth <= 576
-                    ? "95%"
-                    : screenWidth <= 1000
-                    ? "75%"
-                    : screenWidth <= 729
-                    ? "85%"
-                    : "50%",
-              }}
-            >
-              <Row>
-                <Form.Group
-                  className="make-recurring-row"
-                  controlId="formTimeFrame"
-                  style={{ display: "flex" }}
-                >
-                  <Form.Check // prettier-ignore
-                    type="checkbox"
-                    id={`Set Recurring Email Notifications`}
-                    label={`Set Recurring Email Notifications`}
-                    onChange={(e) => {
-                      setMakeRecurring(e.target.checked);
-                      setTimeError("");
-                      setThresholdValueError("");
-                      setEmailError("");
-                      setEmail("");
-                      setThresholdValue("");
-                      setDays("0");
-                      setHours("0");
-                      setMinutes("0");
-                    }}
-                  />
-                </Form.Group>
-              </Row>
-
-              {makeRecurring ? (
-                <Row>
-                  <Row>
-                    <Form.Group
-                      as={Col}
-                      className="form-group"
-                      controlId="formBasicEmail"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      <Form.Label>Email address:</Form.Label>
-                      <Form.Control
-                        type="email"
-                        placeholder="JohnDoe@example.com"
-                        value={email}
-                        onChange={(e) => {
-                          setEmail(e.target.value);
-                          setEmailError("");
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleExecute(email, Number(thresholdValue));
-                          }
-                        }}
-                      />
-                      {emailError ? (
-                        <Form.Label className="error-message">
-                          {emailError}
-                        </Form.Label>
-                      ) : null}
-                    </Form.Group>
-                    <Form.Group
-                      as={Col}
-                      className="form-group"
-                      controlId="formThresholdValue"
-                      style={{ display: "flex", flexDirection: "column" }}
-                    >
-                      <Form.Label>Threshold Value:</Form.Label>
-                      <Form.Control
-                        type="input"
-                        placeholder={`${toSymbol}1.21`}
-                        value={
-                          thresholdValue
-                            ? `${toSymbol}${thresholdValue}`
-                            : `${toSymbol}`
-                        }
-                        onChange={(e) => {
-                          setThresholdValue(e.target.value.slice(1));
-                          setThresholdValueError("");
-                        }}
-                      />
-                      {thresholdValueError ? (
-                        <Form.Label className="error-message">
-                          {thresholdValueError}
-                        </Form.Label>
-                      ) : null}
-                    </Form.Group>
-                  </Row>
-                  <Row>
-                    <Form.Group
-                      as={Col}
-                      className="form-group"
-                      style={{ marginBottom: "0rem" }}
-                    >
-                      <Form.Label style={{ marginBottom: "0rem" }}>
-                        Check Rates Every:
-                      </Form.Label>
-                    </Form.Group>
-                  </Row>
-                  <Row>
-                    <Form.Group as={Col} className="form-group">
-                      <Form.Label>{`Day(s):`}</Form.Label>
-                      <Form.Select
-                        name="days"
-                        onChange={(e) => {
-                          setDays(e.target.value);
-                          setTimeError("");
-                        }}
-                        value={days.length ? days : "days"}
-                      >
-                        {daysRange.map((day) => {
-                          return (
-                            <option key={`day+${day}`} value={day}>
-                              {day}
-                            </option>
-                          );
-                        })}
-                      </Form.Select>
-                    </Form.Group>
-                    <Form.Group as={Col} className="form-group">
-                      <Form.Label>{`Hour(s):`}</Form.Label>
-                      <Form.Select
-                        name="hours"
-                        onChange={(e) => {
-                          setHours(e.target.value);
-                          setTimeError("");
-                        }}
-                        value={hours.length ? hours : "hours"}
-                      >
-                        {hoursRange.map((hour) => {
-                          return (
-                            <option key={`hour+${hour}`} value={hour}>
-                              {hour}
-                            </option>
-                          );
-                        })}
-                      </Form.Select>
-                      {timeError ? (
-                        <Form.Label className="error-message">
-                          {timeError}
-                        </Form.Label>
-                      ) : null}
-                    </Form.Group>
-                    <Form.Group as={Col} className="form-group">
-                      <Form.Label>{`Minute(s):`}</Form.Label>
-                      <Form.Select
-                        name="minutes"
-                        onChange={(e) => {
-                          setMinutes(e.target.value);
-                          setTimeError("");
-                        }}
-                        value={minutes.length ? minutes : "minutes"}
-                      >
-                        {minutesRange.map((minute) => {
-                          return (
-                            <option key={`minute+${minute}`} value={minute}>
-                              {minute}
-                            </option>
-                          );
-                        })}
-                      </Form.Select>
-                    </Form.Group>
-                  </Row>
-                  <Row style={{ marginTop: "1rem" }}>
-                    <Form.Group
-                      className="make-recurring-row"
-                      controlId="formTimeFrame"
-                      style={{ display: "flex" }}
-                    >
-                      <Form.Check // prettier-ignore
-                        type="checkbox"
-                        id={`Also Send Exchange Rate Trend Notifications`}
-                        label={`Also Send Exchange Rate Trend Notifications`}
-                        style={{
-                          fontSize: screenWidth <= 405 ? "0.9rem" : null,
-                        }}
-                        onChange={(e) => {
-                          setEmailTrend(e.target.checked);
-                        }}
-                      />
-                    </Form.Group>
-                  </Row>
-                </Row>
+                      ? `${fromSymbol}1 = ${exchangeRate}${toSymbol}`
+                      : `1${fromSymbol} = ${exchangeRate}${toSymbol}`}
+                  </h4>
+                </div>
               ) : null}
-            </Form>
-            {makeRecurring ? (
               <div className="button-div">
                 <Button
-                  variant="success"
-                  className="rate-buttons"
-                  style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
-                  onClick={() => {
-                    handleRecurringEmailRequest();
-                  }}
-                >
-                  Set Recurring Emails
-                </Button>
-
-                <Button
-                  variant="danger"
+                  variant="primary"
                   className="rate-buttons"
                   onClick={() => {
-                    handleDeleteRecurringEmailRequests();
+                    handleGetRateOnce();
                   }}
-                  style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
                 >
-                  Remove Recurring Emails
+                  Get Exchange Rate
                 </Button>
               </div>
-            ) : null}
-          </>
-        )}
-        <ToastContainer position="bottom-end" className="p-3">
-          <Toast
-            onClose={() => setShowToast(false)}
-            show={showToast}
-            delay={10000}
-            autohide
-          >
-            <Toast.Header>
-              {toastIcon}
-              <strong className="me-auto">{requestStatus}</strong>
-            </Toast.Header>
-            <Toast.Body style={{ textAlign: "center" }}>
-              {toastMessage}
-            </Toast.Body>
-          </Toast>
-        </ToastContainer>
+              <Form
+                style={{
+                  width:
+                    screenWidth <= 576
+                      ? "95%"
+                      : screenWidth <= 1000
+                      ? "75%"
+                      : screenWidth <= 729
+                      ? "85%"
+                      : "50%",
+                }}
+              >
+                <Row>
+                  <Form.Group
+                    className="make-recurring-row"
+                    controlId="formTimeFrame"
+                    style={{ display: "flex" }}
+                  >
+                    <Form.Check // prettier-ignore
+                      type="checkbox"
+                      id={`Set Recurring Email Notifications`}
+                      label={`Set Recurring Email Notifications`}
+                      onChange={(e) => {
+                        setMakeRecurring(e.target.checked);
+                        setTimeError("");
+                        setThresholdValueError("");
+                        setEmailError("");
+                        setEmail("");
+                        setThresholdValue("");
+                        setDays("0");
+                        setHours("0");
+                        setMinutes("0");
+                      }}
+                    />
+                  </Form.Group>
+                </Row>
+
+                {makeRecurring ? (
+                  <Row>
+                    <Row>
+                      <Form.Group
+                        as={Col}
+                        className="form-group"
+                        controlId="formBasicEmail"
+                        style={{ display: "flex", flexDirection: "column" }}
+                      >
+                        <Form.Label>Email address:</Form.Label>
+                        <Form.Control
+                          type="email"
+                          placeholder="JohnDoe@example.com"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            setEmailError("");
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleExecute(email, Number(thresholdValue));
+                            }
+                          }}
+                        />
+                        {emailError ? (
+                          <Form.Label className="error-message">
+                            {emailError}
+                          </Form.Label>
+                        ) : null}
+                      </Form.Group>
+                      <Form.Group
+                        as={Col}
+                        className="form-group"
+                        controlId="formThresholdValue"
+                        style={{ display: "flex", flexDirection: "column" }}
+                      >
+                        <Form.Label>Threshold Value:</Form.Label>
+                        <Form.Control
+                          type="input"
+                          placeholder={`${toSymbol}1.21`}
+                          value={
+                            thresholdValue
+                              ? `${toSymbol}${thresholdValue}`
+                              : `${toSymbol}`
+                          }
+                          onChange={(e) => {
+                            setThresholdValue(e.target.value.slice(1));
+                            setThresholdValueError("");
+                          }}
+                        />
+                        {thresholdValueError ? (
+                          <Form.Label className="error-message">
+                            {thresholdValueError}
+                          </Form.Label>
+                        ) : null}
+                      </Form.Group>
+                    </Row>
+                    <Row>
+                      <Form.Group
+                        as={Col}
+                        className="form-group"
+                        style={{ marginBottom: "0rem" }}
+                      >
+                        <Form.Label style={{ marginBottom: "0rem" }}>
+                          Check Rates Every:
+                        </Form.Label>
+                      </Form.Group>
+                    </Row>
+                    <Row>
+                      <Form.Group as={Col} className="form-group">
+                        <Form.Label>{`Day(s):`}</Form.Label>
+                        <Form.Select
+                          name="days"
+                          onChange={(e) => {
+                            setDays(e.target.value);
+                            setTimeError("");
+                          }}
+                          value={days.length ? days : "days"}
+                        >
+                          {daysRange.map((day) => {
+                            return (
+                              <option key={`day+${day}`} value={day}>
+                                {day}
+                              </option>
+                            );
+                          })}
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group as={Col} className="form-group">
+                        <Form.Label>{`Hour(s):`}</Form.Label>
+                        <Form.Select
+                          name="hours"
+                          onChange={(e) => {
+                            setHours(e.target.value);
+                            setTimeError("");
+                          }}
+                          value={hours.length ? hours : "hours"}
+                        >
+                          {hoursRange.map((hour) => {
+                            return (
+                              <option key={`hour+${hour}`} value={hour}>
+                                {hour}
+                              </option>
+                            );
+                          })}
+                        </Form.Select>
+                        {timeError ? (
+                          <Form.Label className="error-message">
+                            {timeError}
+                          </Form.Label>
+                        ) : null}
+                      </Form.Group>
+                      <Form.Group as={Col} className="form-group">
+                        <Form.Label>{`Minute(s):`}</Form.Label>
+                        <Form.Select
+                          name="minutes"
+                          onChange={(e) => {
+                            setMinutes(e.target.value);
+                            setTimeError("");
+                          }}
+                          value={minutes.length ? minutes : "minutes"}
+                        >
+                          {minutesRange.map((minute) => {
+                            return (
+                              <option key={`minute+${minute}`} value={minute}>
+                                {minute}
+                              </option>
+                            );
+                          })}
+                        </Form.Select>
+                      </Form.Group>
+                    </Row>
+                    <Row style={{ marginTop: "1rem" }}>
+                      <Form.Group
+                        className="make-recurring-row"
+                        controlId="formTimeFrame"
+                        style={{ display: "flex" }}
+                      >
+                        <Form.Check // prettier-ignore
+                          type="checkbox"
+                          id={`Also Send Exchange Rate Trend Notifications`}
+                          label={`Also Send Exchange Rate Trend Notifications`}
+                          style={{
+                            fontSize: screenWidth <= 405 ? "0.9rem" : null,
+                          }}
+                          onChange={(e) => {
+                            setEmailTrend(e.target.checked);
+                          }}
+                        />
+                      </Form.Group>
+                    </Row>
+                  </Row>
+                ) : null}
+              </Form>
+              {makeRecurring ? (
+                <div className="button-div">
+                  <Button
+                    variant="success"
+                    className="rate-buttons"
+                    style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
+                    onClick={() => {
+                      handleRecurringEmailRequest();
+                    }}
+                  >
+                    Set Recurring Emails
+                  </Button>
+
+                  <Button
+                    variant="danger"
+                    className="rate-buttons"
+                    onClick={() => {
+                      handleDeleteRecurringEmailRequests();
+                    }}
+                    style={{ fontSize: screenWidth <= 405 ? "0.9rem" : null }}
+                  >
+                    Remove Recurring Emails
+                  </Button>
+                </div>
+              ) : null}
+            </>
+          )}
+          <ToastContainer position="bottom-end" className="p-3">
+            <Toast
+              onClose={() => setShowToast(false)}
+              show={showToast}
+              delay={10000}
+              autohide
+            >
+              <Toast.Header>
+                {toastIcon}
+                <strong className="me-auto">{requestStatus}</strong>
+              </Toast.Header>
+              <Toast.Body style={{ textAlign: "center" }}>
+                {toastMessage}
+              </Toast.Body>
+            </Toast>
+          </ToastContainer>
+        </div>
       </>
     </div>
   );
